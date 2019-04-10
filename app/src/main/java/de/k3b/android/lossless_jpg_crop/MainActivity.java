@@ -19,7 +19,7 @@ import com.yalantis.ucrop.view.UCropView;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-public class MainActivity extends AppCompatActivity implements UCropFragmentCallback {
+public class MainActivity extends AppCompatActivity  {
     private static final String TAG = "ResultActivity";
 
     private ImageProcessor mSpectrum;
@@ -72,45 +72,6 @@ public class MainActivity extends AppCompatActivity implements UCropFragmentCall
 
     }
 
-    // UCropFragmentCallback
-    @Override
-    public void loadingProgress(boolean showLoader) {
-        // mShowLoader = showLoader;
-        supportInvalidateOptionsMenu();
-    }
-
-    // UCropFragmentCallback
-    @Override
-    public void onCropFinish(UCropFragment.UCropResult result) {
-        switch (result.mResultCode) {
-            case RESULT_OK:
-                handleCropResult(result.mResultData);
-                break;
-            case UCrop.RESULT_ERROR:
-                handleCropError(result.mResultData);
-                break;
-        }
-    }
-
-    private void handleCropResult(@NonNull Intent result) {
-        final Uri resultUri = UCrop.getOutput(result);
-        if (resultUri != null) {
-            ResultActivity.startWithUri(SampleActivity.this, resultUri);
-        } else {
-            Toast.makeText(SampleActivity.this, R.string.toast_cannot_retrieve_cropped_image, Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    @SuppressWarnings("ThrowableResultOfMethodCallIgnored")
-    private void handleCropError(@NonNull Intent result) {
-        final Throwable cropError = UCrop.getError(result);
-        if (cropError != null) {
-            Log.e(TAG, "handleCropError: ", cropError);
-            Toast.makeText(SampleActivity.this, cropError.getMessage(), Toast.LENGTH_LONG).show();
-        } else {
-            Toast.makeText(SampleActivity.this, R.string.toast_unexpected_error, Toast.LENGTH_SHORT).show();
-        }
-    }
 
 
 
