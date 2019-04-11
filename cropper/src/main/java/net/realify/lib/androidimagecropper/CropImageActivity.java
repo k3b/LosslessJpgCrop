@@ -24,8 +24,8 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
+// import android.support.v7.app.ActionBar;
+// import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -38,7 +38,7 @@ import java.io.IOException;
  * Built-in activity for image cropping.<br>
  * Use {@link CropImage#activity(Uri)} to create a builder to start this activity.
  */
-public class CropImageActivity extends AppCompatActivity
+public class CropImageActivity extends Activity
     implements CropImageView.OnSetImageUriCompleteListener,
         CropImageView.OnCropImageCompleteListener {
 
@@ -84,15 +84,19 @@ public class CropImageActivity extends AppCompatActivity
       }
     }
 
+    CharSequence title = mOptions != null &&
+            mOptions.activityTitle != null && mOptions.activityTitle.length() > 0
+            ? mOptions.activityTitle
+            : getResources().getString(R.string.crop_image_activity_title);
+
+    /*
     ActionBar actionBar = getSupportActionBar();
     if (actionBar != null) {
-      CharSequence title = mOptions != null &&
-          mOptions.activityTitle != null && mOptions.activityTitle.length() > 0
-              ? mOptions.activityTitle
-              : getResources().getString(R.string.crop_image_activity_title);
       actionBar.setTitle(title);
       actionBar.setDisplayHomeAsUpEnabled(true);
     }
+    */
+    setTitle(title);
   }
 
   @Override
