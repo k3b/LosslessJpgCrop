@@ -53,4 +53,12 @@ public class ImageState {
     public int getCropOffsetX() {
         return Math.round((mCropRect.left - mCurrentImageRect.left) / mCurrentScale);
     }
+
+    @Override
+    public String toString() {
+        return getClass().getSimpleName() + "(mCropRect:" +
+                mCropRect+ ", mCurrentImageRect:" +
+                mCurrentImageRect + ", mCurrentScale:" +
+                mCurrentScale + ", mCurrentAngle:" +mCurrentAngle + ")";
+    }
 }

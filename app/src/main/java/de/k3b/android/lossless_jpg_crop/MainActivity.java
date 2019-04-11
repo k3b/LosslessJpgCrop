@@ -5,14 +5,18 @@ import android.app.ActionBar;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.graphics.RectF;
 import android.net.Uri;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.yalantis.ucrop.model.ImageState;
 import com.yalantis.ucrop.view.GestureCropImageView;
 import com.yalantis.ucrop.view.OverlayView;
 import com.yalantis.ucrop.view.UCropView;
@@ -25,6 +29,11 @@ public class MainActivity extends BaseActivity  {
     private static final int REQUEST_GET_PICTURE = 1;
     protected static final int REQUEST_GET_PICTURE_PERMISSION = 101;
 
+    private static final int REQUEST_SAVE_PICTURE = 2;
+    private static final int REQUEST_SAVE_PICTURE_PERMISSION = 102;
+
+    private GestureCropImageView mImageView;
+    private OverlayView mCropView;
 
     private ImageProcessor mSpectrum;
 
@@ -44,29 +53,17 @@ public class MainActivity extends BaseActivity  {
             try {
                 UCropView uCropView = findViewById(R.id.ucrop);
 
-                final GestureCropImageView cropImageView = uCropView.getCropImageView();
-                cropImageView.setImageUri(uri, null);
-                cropImageView.setRotateEnabled(false);
+                mImageView = uCropView.getCropImageView();
 
+                mImageView.setImageUri(uri, null);
+                mImageView.setRotateEnabled(false);
 
-                final OverlayView cropOverlayView = uCropView.getOverlayView();
-                cropOverlayView.setShowCropFrame(true);
-                cropOverlayView.setShowCropGrid(true);
-                cropOverlayView.setDimmedColor(Color.TRANSPARENT);
-                cropOverlayView.setFreestyleCropMode(OverlayView.FREESTYLE_CROP_MODE_ENABLE);
+                mCropView = uCropView.getOverlayView();
+                mCropView.setShowCropFrame(true);
+                mCropView.setShowCropGrid(true);
+                mCropView.setDimmedColor(Color.TRANSPARENT);
+                mCropView.setFreestyleCropMode(OverlayView.FREESTYLE_CROP_MODE_ENABLE);
 
-
-                /* parameters for UCropActivity/UCropFragment not used here
-                UCrop.Options options = new UCrop.Options();
-
-                options.setCompressionFormat(Bitmap.CompressFormat.JPEG);
-                options.setCompressionQuality(80);
-                options.setHideBottomControls(true);
-                options.setFreeStyleCropEnabled(true);
-                options.setAllowedGestures(UCropActivity.SCALE, UCropActivity.SCALE, UCropActivity.SCALE);
-
-                uCropView.withOptions(options);
-                */
             } catch (Exception e) {
                 Log.e(TAG, "setImageUri", e);
                 Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
@@ -85,6 +82,24 @@ public class MainActivity extends BaseActivity  {
             actionBar.setTitle(getString(R.string.app_name)); // , options.outWidth, options.outHeight));
         }
 
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(final Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.menu_save) {
+            saveCroppedImage();
+/*
+        } else if (item.getItemId() == android.R.id.home) {
+            onBackPressed();
+*/
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     private void pickFromGallery() {
@@ -117,6 +132,41 @@ public class MainActivity extends BaseActivity  {
         return;
     }
 
+    private void saveCroppedImage() {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+            requestPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                    getString(R.string.permission_write_storage_rationale),
+                    REQUEST_SAVE_PICTURE_PERMISSION);
+        } else {
+            Uri imageUri = getIntent().getData();
+
+            /**
+            !!!! mImageView.getCurrentCropImageState() scale must be fixed according to image with/hight/orientation
+                    see BitmapLoadTask.resize() for new details
+                    curent workaround: load visible image with full bitmap instead of uri
+             **/
+            debug(imageUri, mImageView.getRelativeCroppingRectangleF());
+            /*
+            if (imageUri != null && imageUri.getScheme().equals("file")) {
+                try {
+                    copyFileToDownloads(getIntent().getData());
+                } catch (Exception e) {
+                    Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                    Log.e(TAG, imageUri.toString(), e);
+                }
+            } else {
+                Toast.makeText(this, getString(R.string.toast_unexpected_error), Toast.LENGTH_SHORT).show();
+            }
+            */
+        }
+    }
+
+    private void debug(Uri imageUri, RectF currentCropImageState) {
+        Log.d(TAG, imageUri.getLastPathSegment() + "(" + currentCropImageState + ")");
+    }
+
+
     /**
      * Callback received when a permissions request has been completed.
      */
@@ -126,6 +176,11 @@ public class MainActivity extends BaseActivity  {
             case REQUEST_GET_PICTURE_PERMISSION:
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     pickFromGallery();
+                }
+                break;
+            case REQUEST_SAVE_PICTURE_PERMISSION:
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    saveCroppedImage();
                 }
                 break;
             default:

@@ -83,11 +83,36 @@ public class CropImageView extends TransformImageView {
         new BitmapCropTask(getViewBitmap(), imageState, cropParameters, cropCallback).execute();
     }
 
+    /** Return the current (un-executed) target image parameters relativ to this.width/height */
     public ImageState getCurrentCropImageState() {
+
         return new ImageState(
                 mCropRect, RectUtils.trapToRect(mCurrentImageCorners),
                 getCurrentScale(), getCurrentAngle());
     }
+
+    /** retriefes current crupping area as relative rectangle where every value is range between 0.0 ... 1.0 */
+    public RectF getRelativeCroppingRectangleF() {
+        CropImageView imageView = this;
+
+        final ImageState currentCropImageState = imageView.getCurrentCropImageState();
+
+        final int cropOffsetX = currentCropImageState.getCropOffsetX();
+        final int croppedImageWidth = currentCropImageState.getCroppedImageWidth();
+        final int cropOffsetY = currentCropImageState.getCropOffsetY();
+        final int croppedImageHeight = currentCropImageState.getCroppedImageHeight();
+
+        final int imageViewWidth = imageView.getWidth();
+        final int imageViewHeight = imageView.getHeight();
+
+        float left = (1.0f * cropOffsetX) / imageViewWidth;
+        float top = (1.0f * cropOffsetY) / imageViewHeight;
+        float right = (1.0f * (cropOffsetX +  croppedImageWidth)) / imageViewWidth;
+        float bottom = (1.0f * (cropOffsetY + croppedImageHeight)) / imageViewHeight;
+
+        return new RectF(left, top, right, bottom);
+    }
+
 
     /**
      * @return - maximum scale value for current image and crop ratio

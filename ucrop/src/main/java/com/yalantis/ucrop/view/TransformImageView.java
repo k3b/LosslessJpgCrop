@@ -43,7 +43,7 @@ public class TransformImageView extends ImageView {
 
     protected TransformImageListener mTransformImageListener;
 
-    private float[] mInitialImageCorners;
+    protected float[] mInitialImageCorners;
     private float[] mInitialImageCenter;
 
     protected boolean mBitmapDecoded = false;
