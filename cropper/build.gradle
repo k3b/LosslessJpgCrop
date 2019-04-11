@@ -1,0 +1,33 @@
+apply plugin: 'com.android.library'
+
+android {
+
+    compileSdkVersion rootProject.compileSdkVersion
+    buildToolsVersion rootProject.buildToolsVersion
+
+    defaultConfig {
+        minSdkVersion 15
+        targetSdkVersion rootProject.compileSdkVersion
+        versionCode 1
+        versionName PUBLISH_VERSION
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    lintOptions {
+        abortOnError false
+    }
+}
+
+repositories {
+    maven { url "https://jitpack.io" }
+}
+
+dependencies {
+    api "com.android.support:appcompat-v7:$supportLibraryVersion"
+    implementation "com.android.support:exifinterface:$supportLibraryVersion"
+
+    implementation 'com.github.Realify:Android-Image-Cropper:master'
+}
+

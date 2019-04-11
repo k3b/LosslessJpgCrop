@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Rect;
 import android.graphics.RectF;
 import android.net.Uri;
 import android.os.Build;
@@ -15,7 +16,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-import com.naver.android.helloyako.imagecrop.view.ImageCropView;
+import net.realify.lib.androidimagecropper.CropImageView;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -44,12 +45,15 @@ public class MainActivity extends BaseActivity  {
             pickFromGallery();
         } else {
             try {
-                ImageCropView uCropView = findViewById(R.id.ucrop);
+                CropImageView uCropView = findViewById(R.id.ucrop);
 
+                /*
                 InputStream stream = getContentResolver().openInputStream(uri);
                 Bitmap bitmap = BitmapFactory.decodeStream(stream);
 
                 uCropView.setImageBitmap(bitmap);
+                */
+                uCropView.setImageUriAsync(uri);
             } catch (Exception e) {
                 Log.e(TAG, "setImageUri", e);
                 Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
@@ -115,6 +119,12 @@ public class MainActivity extends BaseActivity  {
         } else {
             Uri imageUri = getIntent().getData();
 
+            CropImageView uCropView = findViewById(R.id.ucrop);
+
+            Rect crop = uCropView.getCropRect();
+
+            debug(imageUri, crop);
+
             /**
             !!!! mImageView.getCurrentCropImageState() scale must be fixed according to image with/hight/orientation
                     see BitmapLoadTask.resize() for new details
@@ -136,7 +146,7 @@ public class MainActivity extends BaseActivity  {
         }
     }
 
-    private void debug(Uri imageUri, RectF currentCropImageState) {
+    private void debug(Uri imageUri, Object currentCropImageState) {
         Log.d(TAG, imageUri.getLastPathSegment() + "(" + currentCropImageState + ")");
     }
 

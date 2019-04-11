@@ -22,8 +22,19 @@ allprojects {
     repositories {
         google()
         jcenter()
-        // maven { url "https://jitpack.io" }
+        maven { url "https://jitpack.io" }
     }
+}
+
+ext {
+    compileSdkVersion = 28
+    buildToolsVersion = '28.0.3'
+    supportLibraryVersion = '28.0.0'
+
+    PUBLISH_GROUP_ID = 'net.realify.lib'
+    PUBLISH_ARTIFACT_ID = 'android-image-cropper'
+    PUBLISH_VERSION = '1.0.0'
+    // gradlew clean build generateRelease
 }
 
 task clean(type: Delete) {

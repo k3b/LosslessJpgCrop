@@ -36,5 +36,7 @@ dependencies {
     // implementation project(':ucrop')
     // implementation 'com.github.yalantis:ucrop:2.2.3'
     // implementation 'com.edmodo:cropper:1.0.1'
-    implementation "com.naver.android.helloyako:imagecropview:1.2.2"
+    // implementation "com.naver.android.helloyako:imagecropview:1.2.2"
+    // implementation 'com.github.realify.Android-Image-Cropper:1.0.0'
+    implementation project(':cropper')
 }

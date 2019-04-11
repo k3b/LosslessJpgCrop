@@ -1,2 +1,2 @@
 // include ':app', ':ucrop'
-include ':app'
+include ':app', ':cropper'
