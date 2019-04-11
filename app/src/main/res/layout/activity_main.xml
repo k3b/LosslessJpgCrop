@@ -8,10 +8,30 @@
     tools:context=".MainActivity"
     >
 
+    <!--
     <com.yalantis.ucrop.view.UCropView
         android:id="@+id/ucrop"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
+    <com.edmodo.cropper.CropImageView
+        android:id="@+id/ucrop"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        />
+-->
 
+    <com.naver.android.helloyako.imagecrop.view.ImageCropView
+        xmlns:imagecrop="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/ucrop"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="visible"
+        imagecrop:outsideLayerColor="#99000000"
+        imagecrop:setInnerGridMode="on"
+        imagecrop:gridInnerStroke="1dp"
+        imagecrop:gridInnerColor="#66ffffff"
+        imagecrop:setOuterGridMode="on"
+        imagecrop:gridOuterStroke="1dp"
+        imagecrop:gridOuterColor="#ffffff"/>
 
 </LinearLayout>

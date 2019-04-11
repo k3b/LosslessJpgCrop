@@ -1,1 +1,2 @@
-include ':app', ':ucrop'
+// include ':app', ':ucrop'
+include ':app'

@@ -1,25 +1,21 @@
 package de.k3b.android.lossless_jpg_crop;
 
 import android.Manifest;
-import android.app.ActionBar;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.RectF;
 import android.net.Uri;
 import android.os.Build;
-import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-import com.yalantis.ucrop.model.ImageState;
-import com.yalantis.ucrop.view.GestureCropImageView;
-import com.yalantis.ucrop.view.OverlayView;
-import com.yalantis.ucrop.view.UCropView;
+import com.naver.android.helloyako.imagecrop.view.ImageCropView;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -31,9 +27,6 @@ public class MainActivity extends BaseActivity  {
 
     private static final int REQUEST_SAVE_PICTURE = 2;
     private static final int REQUEST_SAVE_PICTURE_PERMISSION = 102;
-
-    private GestureCropImageView mImageView;
-    private OverlayView mCropView;
 
     private ImageProcessor mSpectrum;
 
@@ -51,35 +44,16 @@ public class MainActivity extends BaseActivity  {
             pickFromGallery();
         } else {
             try {
-                UCropView uCropView = findViewById(R.id.ucrop);
+                ImageCropView uCropView = findViewById(R.id.ucrop);
 
-                mImageView = uCropView.getCropImageView();
+                InputStream stream = getContentResolver().openInputStream(uri);
+                Bitmap bitmap = BitmapFactory.decodeStream(stream);
 
-                mImageView.setImageUri(uri, null);
-                mImageView.setRotateEnabled(false);
-
-                mCropView = uCropView.getOverlayView();
-                mCropView.setShowCropFrame(true);
-                mCropView.setShowCropGrid(true);
-                mCropView.setDimmedColor(Color.TRANSPARENT);
-                mCropView.setFreestyleCropMode(OverlayView.FREESTYLE_CROP_MODE_ENABLE);
-
+                uCropView.setImageBitmap(bitmap);
             } catch (Exception e) {
                 Log.e(TAG, "setImageUri", e);
                 Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
             }
-        }
-
-        /*
-        final BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inJustDecodeBounds = true;
-        BitmapFactory.decodeFile(new File(getIntent().getData().getPath()).getAbsolutePath(), options);
-        */
-
-        final ActionBar actionBar = this.getActionBar();
-        if (actionBar != null) {
-            actionBar.setDisplayHomeAsUpEnabled(true);
-            actionBar.setTitle(getString(R.string.app_name)); // , options.outWidth, options.outHeight));
         }
 
     }
@@ -146,7 +120,7 @@ public class MainActivity extends BaseActivity  {
                     see BitmapLoadTask.resize() for new details
                     curent workaround: load visible image with full bitmap instead of uri
              **/
-            debug(imageUri, mImageView.getRelativeCroppingRectangleF());
+            // debug(imageUri, mImageView.getRelativeCroppingRectangleF());
             /*
             if (imageUri != null && imageUri.getScheme().equals("file")) {
                 try {
@@ -171,7 +145,7 @@ public class MainActivity extends BaseActivity  {
      * Callback received when a permissions request has been completed.
      */
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         switch (requestCode) {
             case REQUEST_GET_PICTURE_PERMISSION:
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
