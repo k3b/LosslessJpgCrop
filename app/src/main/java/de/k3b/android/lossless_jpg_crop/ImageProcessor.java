@@ -1,6 +1,7 @@
 package de.k3b.android.lossless_jpg_crop;
 
 import android.content.Context;
+import android.graphics.Rect;
 import android.util.Log;
 
 import com.facebook.spectrum.Configuration;
@@ -25,12 +26,16 @@ public class ImageProcessor {
         SpectrumSoLoader.init(context);
     }
 
-    public void ImageProcessor() {
+    public ImageProcessor() {
         mSpectrum = Spectrum.make(
                 new SpectrumLogcatLogger(Log.INFO),
                 Configuration.makeEmpty(),
                 SpectrumPluginJpeg.get()); // JPEG only
         // DefaultPlugins.get()); // JPEG, PNG and WebP plugins
+    }
+
+    public void crop(InputStream inputStream, OutputStream outputStream, Rect rect, int degrees) {
+        crop(inputStream, outputStream, rect.left, rect.top, rect.right, rect.bottom, degrees);
     }
 
     public void crop(InputStream inputStream, OutputStream outputStream, int left, int top, int right, int bottom, int degrees) {
@@ -45,7 +50,7 @@ public class ImageProcessor {
                             .cropAbsoluteToOrigin(left, top, right, bottom, false)
 
                             // forceUpOrientation=true
-                            .rotate(degrees, false, false, true)
+                            // .rotate(degrees, false, false, true)
                             .build(),
                     "my_callsite_identifier");
         } catch (Exception ex) {

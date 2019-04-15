@@ -4,7 +4,9 @@ android {
     compileSdkVersion 28
     defaultConfig {
         applicationId "de.k3b.android.lossless_jpg_crop"
-        minSdkVersion 15
+
+        // SAF ACTION_CREATE_DOCUMENT requires api-19 and later
+        minSdkVersion 19
         targetSdkVersion 28
         versionCode 1
         versionName "1.0"
