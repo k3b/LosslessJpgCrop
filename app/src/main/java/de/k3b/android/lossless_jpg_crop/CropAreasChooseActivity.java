@@ -1,6 +1,8 @@
 package de.k3b.android.lossless_jpg_crop;
 
 import android.Manifest;
+import android.app.Activity;
+import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Rect;
@@ -8,6 +10,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.FileProvider;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -16,9 +19,13 @@ import android.widget.Toast;
 import net.realify.lib.androidimagecropper.CropImageView;
 
 import java.io.Closeable;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+
+import static android.content.Intent.EXTRA_STREAM;
 
 public class CropAreasChooseActivity extends BaseActivity  {
     private static final String TAG = "ResultActivity";
@@ -80,20 +87,68 @@ public class CropAreasChooseActivity extends BaseActivity  {
 
     @Override
     public boolean onCreateOptionsMenu(final Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_main, menu);
+        String action = getIntent().getAction();
+
+		/*
+        if (Intent.ACTION_GET_CONTENT.compareToIgnoreCase(action) == 0) {
+            getMenuInflater().inflate(R.menu.menu_get_content, menu);
+        } else if (Intent.ACTION_SEND.compareToIgnoreCase(action) == 0) {
+            getMenuInflater().inflate(R.menu.menu_send, menu);
+        } else if (Intent.ACTION_SENDTO.compareToIgnoreCase(action) == 0) {
+            getMenuInflater().inflate(R.menu.menu_send_to, menu);
+        } else {
+            getMenuInflater().inflate(R.menu.menu_edit, menu);
+        }
+		*/
+		
+		getMenuInflater().inflate(R.menu.menu_edit, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == R.id.menu_save) {
-            saveCroppedImage();
-/*
-        } else if (item.getItemId() == android.R.id.home) {
-            onBackPressed();
-*/
+        switch (item.getItemId()) {
+            case R.id.menu_save:
+                return saveAsPublicCroppedImage();
+/*				
+            case R.id.menu_send: {
+                createSendIntend(true);
+
+            }
+                reloadContext = false;
+                IntentUtil.cmdStartIntent("share", this, null, null, getCurrentFilePath(), Intent.ACTION_SEND, R.string.share_menu_title, R.string.share_err_not_found, 0);
+                break;
+*/				
+            default:
+                return super.onOptionsItemSelected(item);
         }
-        return super.onOptionsItemSelected(item);
+        // return true;
+    }
+
+    private void createSendIntend(boolean asExtra) {
+        Intent sourceIntent = getIntent();
+        Uri uri = createPrivateOutUriOrNull();
+
+        if (uri != null) {
+            final Intent outIntent = new Intent(sourceIntent.getAction())
+                    .addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET)
+                    .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            copyExtra(outIntent, sourceIntent.getExtras(),
+                    Intent.EXTRA_EMAIL, Intent.EXTRA_CC, Intent.EXTRA_BCC, Intent.EXTRA_SUBJECT);
+
+            if (asExtra)
+                outIntent.putExtra(Intent.EXTRA_STREAM, uri)
+                    .setType(IMAGE_JPEG_MIME);
+            else
+                outIntent.setDataAndType(uri, IMAGE_JPEG_MIME);
+        }
+    }
+
+    private static void copyExtra(Intent outIntent, Bundle extras, String... extraIds) {
+        for(String id: extraIds) {
+            String value = extras.getString(id, null);
+            if (value != null) outIntent.putExtra(id, value);
+        }
     }
 
     private void pickFromGallery() {
@@ -126,42 +181,19 @@ public class CropAreasChooseActivity extends BaseActivity  {
         return;
     }
 
-    private void saveCroppedImage() {
+    private boolean saveAsPublicCroppedImage() {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED) {
             requestPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE,
                     getString(R.string.permission_write_storage_rationale),
                     REQUEST_SAVE_PICTURE_PERMISSION);
         } else {
-            Uri imageUri = getIntent().getData();
-
-            Rect crop = getCropRect();
-
-            openOutputUriPicker(REQUEST_SAVE_PICTURE);
-            // debug(imageUri, crop);
-
-            /**
-            !!!! mImageView.getCurrentCropImageState() scale must be fixed according to image with/hight/orientation
-                    see BitmapLoadTask.resize() for new details
-                    curent workaround: load visible image with full bitmap instead of uri
-             **/
-            // debug(imageUri, mImageView.getRelativeCroppingRectangleF());
-            /*
-            if (imageUri != null && imageUri.getScheme().equals("file")) {
-                try {
-                    copyFileToDownloads(getIntent().getData());
-                } catch (Exception e) {
-                    Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
-                    Log.e(TAG, imageUri.toString(), e);
-                }
-            } else {
-                Toast.makeText(this, getString(R.string.toast_unexpected_error), Toast.LENGTH_SHORT).show();
-            }
-            */
+            openPublicOutputUriPicker(REQUEST_SAVE_PICTURE);
         }
+        return true;
     }
 
-    private boolean openOutputUriPicker(int folderpickerCode) {
+    private boolean openPublicOutputUriPicker(int folderpickerCode) {
         Uri inUri = getIntent().getData();
         String originalFileName = (inUri == null) ? "" : inUri.getLastPathSegment();
         String proposedFileName = replaceExtension(originalFileName, "_llcrop.jpg");
@@ -178,7 +210,7 @@ public class CropAreasChooseActivity extends BaseActivity  {
         return true;
     }
 
-    private void onOpenOutputUriPickerResult(int resultCode, Uri outUri) {
+    private void onOpenPublicOutputUriPickerResult(int resultCode, Uri outUri) {
 
         if (resultCode == RESULT_OK) {
             final Uri inUri = getIntent().getData();
@@ -190,8 +222,8 @@ public class CropAreasChooseActivity extends BaseActivity  {
             Log.d(TAG, context_message);
 
             try {
-                inStream = getContentResolver().openInputStream(inUri);
                 outStream = getContentResolver().openOutputStream(outUri, "w");
+                inStream = getContentResolver().openInputStream(inUri);
                 this.mSpectrum.crop(inStream, outStream, rect, 0);
                 finish();
                 return;
@@ -226,11 +258,6 @@ public class CropAreasChooseActivity extends BaseActivity  {
         return uCropView.getCropRect();
     }
 
-    private void debug(Uri imageUri, Object currentCropImageState) {
-        Log.d(TAG, imageUri.getLastPathSegment() + "(" + currentCropImageState + ")");
-    }
-
-
     /**
      * Callback received when a permissions request has been completed.
      */
@@ -244,7 +271,7 @@ public class CropAreasChooseActivity extends BaseActivity  {
                 break;
             case REQUEST_SAVE_PICTURE_PERMISSION:
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    saveCroppedImage();
+                    saveAsPublicCroppedImage();
                 }
                 break;
             default:
@@ -260,28 +287,80 @@ public class CropAreasChooseActivity extends BaseActivity  {
             return;
         }
         if (requestCode == REQUEST_SAVE_PICTURE) {
-            onOpenOutputUriPickerResult(resultCode, data.getData());
+            final Uri outUri = data.getData();
+            onOpenPublicOutputUriPickerResult(resultCode, outUri);
             return;
         }
 
         super.onActivityResult(requestCode, resultCode, data);
     }
 
+    private Uri __delete_saveAsPrivate() {
 
+        final Uri inUri = getIntent().getData();
+        Rect rect = getCropRect();
+        InputStream inStream = null;
+        OutputStream outStream = null;
 
-    //!!! Todo call cropping lib
-    private void crop() throws RuntimeException {
-        InputStream inputStream = null;
-        OutputStream outputStream = null;
+        final String context_message = "Cropping '" + inUri + "'(" + rect + ")";
+        Log.d(TAG, context_message);
 
+        try {
+            final File sharedFolder = new File(getFilesDir(), "shared");
+            final File sharedFile = File.createTempFile("llCrop_",".jpg", sharedFolder);
+            sharedFolder.mkdirs();
+            outStream = new FileOutputStream(sharedFile);
+            inStream = getContentResolver().openInputStream(inUri);
+            this.mSpectrum.crop(inStream, outStream, rect, 0);
 
-        int left=0;
-        int top = 0;
-        int right = 0;
-        int bottom = 0;
-        int degrees = 0;
-        mSpectrum.crop(inputStream, outputStream, left, top, right, bottom, degrees);
+            Uri sharedFileUri = FileProvider.getUriForFile(this, "de.k3b.llCrop", sharedFile);
+
+            return sharedFileUri;
+        } catch (Exception e) {
+            Log.e(TAG, "Error " + context_message + e.getMessage(), e);
+            return null;
+        } finally {
+            close(outStream, outStream);
+            close(inStream, inStream);
+        }
+
     }
+
+    private Uri createPrivateOutUriOrNull() {
+        try {
+            final File sharedFolder = new File(getFilesDir(), "shared");
+            final File sharedFile = File.createTempFile("llCrop_",".jpg", sharedFolder);
+            sharedFolder.mkdirs();
+
+            Uri sharedFileUri = FileProvider.getUriForFile(this, "de.k3b.llCrop", sharedFile);
+
+            return sharedFileUri;
+
+        } catch (Exception e) {
+            Log.e(TAG, e.getMessage(), e);
+            return null;
+        }
+		
+		/* !!!TODO
+        try {
+            android.support.v4.provider.
+            // #64: edit image (not) via chooser
+            final Intent execIntent = (idChooserCaption == 0)
+                    ? outIntent
+                    : Intent.createChooser(outIntent, parentActivity.getText(idChooserCaption));
+
+            ActivityWithCallContext.additionalCallContext = debugContext;
+            if (idActivityResultRequestCode == 0) {
+                parentActivity.startActivity(execIntent);
+            } else {
+                parentActivity.startActivityForResult(execIntent, idActivityResultRequestCode);
+            }
+        } catch (ActivityNotFoundException ex) {
+            Toast.makeText(parentActivity, idEditError,Toast.LENGTH_LONG).show();
+        }
+		*/
+    }
+
 
 
 }
