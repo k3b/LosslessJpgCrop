@@ -8,7 +8,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.provider.DocumentFile;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -17,7 +16,6 @@ import android.widget.Toast;
 import net.realify.lib.androidimagecropper.CropImageView;
 
 import java.io.Closeable;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -30,6 +28,7 @@ public class CropAreasChooseActivity extends BaseActivity  {
     private static final int REQUEST_SAVE_PICTURE = 2;
     private static final int REQUEST_SAVE_PICTURE_PERMISSION = 102;
     private static final String CURRENT_CROP_AREA = "CURRENT_CROP_AREA";
+    private static final String IMAGE_JPEG_MIME = "image/jpeg";
 
     private CropImageView uCropView = null;
     private ImageProcessor mSpectrum;
@@ -106,7 +105,7 @@ public class CropAreasChooseActivity extends BaseActivity  {
                     REQUEST_GET_PICTURE_PERMISSION);
         } else {
             Intent intent = new Intent(Intent.ACTION_GET_CONTENT)
-                    .setType("image/jpeg")
+                    .setType(IMAGE_JPEG_MIME)
                     .addCategory(Intent.CATEGORY_OPENABLE);
 
             startActivityForResult(Intent.createChooser(intent, getString(R.string.label_select_picture)), REQUEST_GET_PICTURE);
@@ -168,7 +167,7 @@ public class CropAreasChooseActivity extends BaseActivity  {
         String proposedFileName = replaceExtension(originalFileName, "_llcrop.jpg");
 
         Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT)
-                            .setType("image/jpeg")
+                            .setType(IMAGE_JPEG_MIME)
                             .addCategory(Intent.CATEGORY_OPENABLE)
                             .putExtra(Intent.EXTRA_TITLE, proposedFileName)
                             .setFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION
