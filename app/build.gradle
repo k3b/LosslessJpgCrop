@@ -8,8 +8,10 @@ android {
         // SAF ACTION_CREATE_DOCUMENT requires api-19 and later
         minSdkVersion 19
         targetSdkVersion 28
+
+        // 1.0.0.190425 (1)    initial version
         versionCode 1
-        versionName "1.0"
+        versionName "1.0.0.190425"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
         // all supported locales. Note: the lib has more translations which are supressed here
