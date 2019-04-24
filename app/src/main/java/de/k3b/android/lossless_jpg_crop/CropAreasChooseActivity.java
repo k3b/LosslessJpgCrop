@@ -28,7 +28,7 @@ import java.io.OutputStream;
 import static android.content.Intent.EXTRA_STREAM;
 
 public class CropAreasChooseActivity extends BaseActivity  {
-    private static final String TAG = "ResultActivity";
+    private static final String TAG = "llCrop";
     private static final int REQUEST_GET_PICTURE = 1;
     protected static final int REQUEST_GET_PICTURE_PERMISSION = 101;
 
@@ -50,6 +50,7 @@ public class CropAreasChooseActivity extends BaseActivity  {
         Uri uri = getIntent().getData();
 
         if (uri == null) {
+            Log.d(TAG, "Intent.data has not initial image uri. Opening Image Picker");
             // must be called with image uri
             pickFromGallery();
         } else {
@@ -70,8 +71,9 @@ public class CropAreasChooseActivity extends BaseActivity  {
 
                 uCropView.setCropRect(crop);
             } catch (Exception e) {
-                Log.e(TAG, "setImageUri", e);
-                Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
+                final String msg = "setImageUri '" + uri + "' ";
+                Log.e(TAG, msg, e);
+                Toast.makeText(this, msg + e.getMessage(), Toast.LENGTH_LONG).show();
             }
         }
 
@@ -159,6 +161,7 @@ public class CropAreasChooseActivity extends BaseActivity  {
                     getString(R.string.permission_read_storage_rationale),
                     REQUEST_GET_PICTURE_PERMISSION);
         } else {
+            Log.d(TAG, "Opening Image Picker");
             Intent intent = new Intent(Intent.ACTION_GET_CONTENT)
                     .setType(IMAGE_JPEG_MIME)
                     .addCategory(Intent.CATEGORY_OPENABLE);
@@ -168,14 +171,17 @@ public class CropAreasChooseActivity extends BaseActivity  {
     }
     private void onGetPictureResult(int resultCode, Intent data) {
         if (resultCode == RESULT_OK) {
-            final Uri selectedUri = data.getData();
+            final Uri selectedUri = (data == null) ? null : data.getData();
             if (selectedUri != null) {
+                Log.d(TAG, "Restarting with uri '" + selectedUri + "'");
+
                 Intent intent = new Intent(Intent.ACTION_VIEW, selectedUri, this, CropAreasChooseActivity.class);
                 this.startActivity(intent);
                 finish();
                 return;
             }
         }
+        Log.d(TAG, this.getString(R.string.toast_cannot_retrieve_selected_image));
         Toast.makeText(this, R.string.toast_cannot_retrieve_selected_image, Toast.LENGTH_SHORT).show();
         finish();
         return;
@@ -206,20 +212,24 @@ public class CropAreasChooseActivity extends BaseActivity  {
                                 | Intent.FLAG_GRANT_WRITE_URI_PERMISSION
                                 | Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION)
                             ;
+
+        Log.d(TAG, "openPublicOutputUriPicker '" + proposedFileName + "'");
+
         startActivityForResult(intent, folderpickerCode);
         return true;
     }
 
     private void onOpenPublicOutputUriPickerResult(int resultCode, Uri outUri) {
+        final Intent intent = getIntent();
+        final Uri inUri = ((resultCode == RESULT_OK) && (intent != null)) ? intent.getData() : null;
 
-        if (resultCode == RESULT_OK) {
-            final Uri inUri = getIntent().getData();
+        if (inUri != null) {
             Rect rect = getCropRect();
             InputStream inStream = null;
             OutputStream outStream = null;
 
             final String context_message = "Cropping '" + inUri + "'(" + rect + ") => '" + outUri + "'";
-            Log.d(TAG, context_message);
+            Log.i(TAG, context_message);
 
             try {
                 outStream = getContentResolver().openOutputStream(outUri, "w");
@@ -233,6 +243,9 @@ public class CropAreasChooseActivity extends BaseActivity  {
                 close(outStream, outStream);
                 close(inStream, inStream);
             }
+        } else {
+            // uri==null or error
+            Log.i(TAG, "onOpenPublicOutputUriPickerResult(null): No output url, not saved.");
         }
     }
 
@@ -287,7 +300,7 @@ public class CropAreasChooseActivity extends BaseActivity  {
             return;
         }
         if (requestCode == REQUEST_SAVE_PICTURE) {
-            final Uri outUri = data.getData();
+            final Uri outUri = (data == null) ? null : data.getData();
             onOpenPublicOutputUriPickerResult(resultCode, outUri);
             return;
         }

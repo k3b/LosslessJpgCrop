@@ -11,6 +11,10 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+        // all supported locales. Note: the lib has more translations which are supressed here
+        // resConfigs "ar","de","es","fr","hi","in","it","ja","nl","pl","ro","ru","tr","uk","zz","pt-rBR","zh-rCN","zh-rTW"
+        resConfigs "de"
     }
     buildTypes {
         debug {
