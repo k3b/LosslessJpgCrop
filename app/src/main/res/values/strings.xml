@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Loss-Less-Crop</string>
+    <string name="app_name">llCrop (Loss Less)</string>
 
     <string name="label_select_picture">Select Picture</string>
 
@@ -7,8 +7,5 @@
     <string name="permission_read_storage_rationale">Storage read permission is needed to pick files.</string>
     <string name="permission_write_storage_rationale">Storage write permission is needed to save the image.</string>
 
-    <string name="toast_cannot_retrieve_selected_image">Cannot retrieve selected image</string>
-    <string name="toast_cannot_retrieve_cropped_image">Cannot retrieve cropped image</string>
-    <string name="toast_unexpected_error">Unexpected error</string>
-
+    <string name="toast_cannot_retrieve_selected_image">Quitting: No source image selected</string>
 </resources>
