@@ -1,0 +1,40 @@
+# travis build for #toGoZip (https://github.com/k3b/ToGoZip/)
+language: android
+
+jdk:
+  - oraclejdk8
+
+addons:
+  apt:
+    packages:
+# graphviz to render javadoc uml
+# https://docs.travis-ci.com/user/multi-os/
+      - graphviz
+
+android:
+  components:
+    # https://github.com/travis-ci/travis-ci/issues/5036
+    - tools
+
+    # values in gradle.properties and .travis must be the same
+    # - build-tools-24.0.2
+    - build-tools-28.0.3
+    - android-28
+
+    - add-on
+    - extra
+
+before_install:
+# http://stackoverflow.com/questions/33820638/travis-yml-gradlew-permission-denied
+# must execute
+# git update-index --chmod=+x gradlew
+# instead of 
+# - chmod +x gradlew
+#
+# https://stackoverflow.com/questions/52274229/travis-ci-android-28-licenses-have-not-been-accepted
+- yes | sdkmanager "platforms;android-28"
+
+ 
+script:
+  - jdk_switcher use oraclejdk8
+  - ./gradlew assemble
