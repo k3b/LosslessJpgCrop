@@ -164,7 +164,11 @@ public class CropAreasChooseActivity extends BaseActivity  {
             Log.d(TAG, "Opening Image Picker");
             Intent intent = new Intent(Intent.ACTION_GET_CONTENT)
                     .setType(IMAGE_JPEG_MIME)
-                    .addCategory(Intent.CATEGORY_OPENABLE);
+                    .addCategory(Intent.CATEGORY_OPENABLE)
+                    // Fix: after pressing "back" return to caller off this app and not to previous-instance
+                    // without parameters
+                    .addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
+                    ;
 
             startActivityForResult(Intent.createChooser(intent, getString(R.string.label_select_picture)), REQUEST_GET_PICTURE);
         }
