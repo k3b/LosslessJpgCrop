@@ -22,6 +22,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 
 public class CropAreasChooseActivity extends BaseActivity  {
     private static final String TAG = "llCrop";
@@ -161,9 +164,6 @@ public class CropAreasChooseActivity extends BaseActivity  {
             Intent intent = new Intent(Intent.ACTION_GET_CONTENT)
                     .setType(IMAGE_JPEG_MIME)
                     .addCategory(Intent.CATEGORY_OPENABLE)
-                    // Fix: after pressing "back" return to caller off this app and not to previous-instance
-                    // without parameters
-                    .addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_GRANT_READ_URI_PERMISSION)
                     ;
 
             startActivityForResult(Intent.createChooser(intent, getString(R.string.label_select_picture)), REQUEST_GET_PICTURE);
@@ -176,6 +176,8 @@ public class CropAreasChooseActivity extends BaseActivity  {
                 Log.d(TAG, "Restarting with uri '" + selectedUri + "'");
 
                 Intent intent = new Intent(Intent.ACTION_VIEW, selectedUri, this, CropAreasChooseActivity.class);
+                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
                 this.startActivity(intent);
                 finish();
                 return;
@@ -228,13 +230,19 @@ public class CropAreasChooseActivity extends BaseActivity  {
             InputStream inStream = null;
             OutputStream outStream = null;
 
-            final String context_message = "Cropping '" + inUri + "'(" + rect + ") => '" + outUri + "'";
+            final String context_message = "Cropping '" + inUri + "'(" + rect + ") => '"
+                    + outUri + "' ('" + toString(outUri) + "')";
             Log.i(TAG, context_message);
 
             try {
-                outStream = getContentResolver().openOutputStream(outUri, "w");
                 inStream = getContentResolver().openInputStream(inUri);
+                outStream = getContentResolver().openOutputStream(outUri, "w");
                 this.mSpectrum.crop(inStream, outStream, rect, 0);
+
+                String message = getString(R.string.toast_saved_as,
+                        toString(outUri));
+                Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+
                 finish();
                 return;
             } catch (Exception e) {
@@ -246,6 +254,15 @@ public class CropAreasChooseActivity extends BaseActivity  {
         } else {
             // uri==null or error
             Log.i(TAG, "onOpenPublicOutputUriPickerResult(null): No output url, not saved.");
+        }
+    }
+
+    private String toString(Uri outUri) {
+        if (outUri == null) return "";
+        try {
+            return URLDecoder.decode(outUri.toString(), StandardCharsets.UTF_8.toString());
+        } catch (UnsupportedEncodingException e) {
+            return outUri.toString();
         }
     }
 

@@ -8,4 +8,5 @@
     <string name="permission_write_storage_rationale">Storage write permission is needed to save the image.</string>
 
     <string name="toast_cannot_retrieve_selected_image">Quitting: No source image selected</string>
+    <string name="toast_saved_as">Saved as \'%1$s\'</string>
 </resources>
