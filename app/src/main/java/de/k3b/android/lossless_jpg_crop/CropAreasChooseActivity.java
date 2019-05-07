@@ -1,16 +1,14 @@
 package de.k3b.android.lossless_jpg_crop;
 
 import android.Manifest;
-import android.app.Activity;
-import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.FileProvider;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.FileProvider;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -24,8 +22,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-
-import static android.content.Intent.EXTRA_STREAM;
 
 public class CropAreasChooseActivity extends BaseActivity  {
     private static final String TAG = "llCrop";
@@ -167,7 +163,7 @@ public class CropAreasChooseActivity extends BaseActivity  {
                     .addCategory(Intent.CATEGORY_OPENABLE)
                     // Fix: after pressing "back" return to caller off this app and not to previous-instance
                     // without parameters
-                    .addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
+                    .addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_GRANT_READ_URI_PERMISSION)
                     ;
 
             startActivityForResult(Intent.createChooser(intent, getString(R.string.label_select_picture)), REQUEST_GET_PICTURE);
