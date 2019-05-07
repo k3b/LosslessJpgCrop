@@ -7,5 +7,6 @@ While there are many apps that can crop images (and may have many more features)
 jpg-re-encoding.
 
 llCrop ("ll" stands for loss-less) can do cropping without quality-losses because it crops in the raw jpg-photo-data without 
-the need for jpg-image-re-encoding.
+the need for jpg-image-re-encoding. It also preserves embedded meta data (Exif/Iptc and xmp)
+
 
