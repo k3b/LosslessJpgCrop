@@ -165,9 +165,6 @@ public class CropAreasChooseActivity extends BaseActivity  {
             Intent intent = new Intent(Intent.ACTION_GET_CONTENT)
                     .setType(IMAGE_JPEG_MIME)
                     .addCategory(Intent.CATEGORY_OPENABLE)
-                    // Fix: after pressing "back" return to caller off this app and not to previous-instance
-                    // without parameters
-                    .addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
                     ;
 
             startActivityForResult(Intent.createChooser(intent, getString(R.string.label_select_picture)), REQUEST_GET_PICTURE);
@@ -180,6 +177,7 @@ public class CropAreasChooseActivity extends BaseActivity  {
                 Log.d(TAG, "Restarting with uri '" + selectedUri + "'");
 
                 Intent intent = new Intent(Intent.ACTION_VIEW, selectedUri, this, CropAreasChooseActivity.class);
+                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                 this.startActivity(intent);
                 finish();
                 return;
@@ -236,8 +234,8 @@ public class CropAreasChooseActivity extends BaseActivity  {
             Log.i(TAG, context_message);
 
             try {
-                outStream = getContentResolver().openOutputStream(outUri, "w");
                 inStream = getContentResolver().openInputStream(inUri);
+                outStream = getContentResolver().openOutputStream(outUri, "w");
                 this.mSpectrum.crop(inStream, outStream, rect, 0);
                 finish();
                 return;
