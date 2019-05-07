@@ -8,4 +8,5 @@
     <string name="permission_write_storage_rationale">Benötige Datei-Schreibrechte um ein Photo zu speichern.</string>
 
     <string name="toast_cannot_retrieve_selected_image">Beende app: Kein Quell Photo ausgewählt</string>
+    <string name="toast_saved_as">Gespeichert als \'%1$s\'</string>
 </resources>

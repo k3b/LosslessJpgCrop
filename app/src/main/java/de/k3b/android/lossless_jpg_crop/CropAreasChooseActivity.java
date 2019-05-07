@@ -1,16 +1,14 @@
 package de.k3b.android.lossless_jpg_crop;
 
 import android.Manifest;
-import android.app.Activity;
-import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.FileProvider;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.FileProvider;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -24,8 +22,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-
-import static android.content.Intent.EXTRA_STREAM;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 
 public class CropAreasChooseActivity extends BaseActivity  {
     private static final String TAG = "llCrop";
@@ -178,6 +177,7 @@ public class CropAreasChooseActivity extends BaseActivity  {
 
                 Intent intent = new Intent(Intent.ACTION_VIEW, selectedUri, this, CropAreasChooseActivity.class);
                 intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
                 this.startActivity(intent);
                 finish();
                 return;
@@ -230,13 +230,19 @@ public class CropAreasChooseActivity extends BaseActivity  {
             InputStream inStream = null;
             OutputStream outStream = null;
 
-            final String context_message = "Cropping '" + inUri + "'(" + rect + ") => '" + outUri + "'";
+            final String context_message = "Cropping '" + inUri + "'(" + rect + ") => '"
+                    + outUri + "' ('" + toString(outUri) + "')";
             Log.i(TAG, context_message);
 
             try {
                 inStream = getContentResolver().openInputStream(inUri);
                 outStream = getContentResolver().openOutputStream(outUri, "w");
                 this.mSpectrum.crop(inStream, outStream, rect, 0);
+
+                String message = getString(R.string.toast_saved_as,
+                        toString(outUri));
+                Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+
                 finish();
                 return;
             } catch (Exception e) {
@@ -248,6 +254,15 @@ public class CropAreasChooseActivity extends BaseActivity  {
         } else {
             // uri==null or error
             Log.i(TAG, "onOpenPublicOutputUriPickerResult(null): No output url, not saved.");
+        }
+    }
+
+    private String toString(Uri outUri) {
+        if (outUri == null) return "";
+        try {
+            return URLDecoder.decode(outUri.toString(), StandardCharsets.UTF_8.toString());
+        } catch (UnsupportedEncodingException e) {
+            return outUri.toString();
         }
     }
 

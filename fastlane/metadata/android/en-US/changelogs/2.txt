@@ -1,0 +1,4 @@
+Bugfix: missing read permission
+Added: success message
+ported to android-x
+
