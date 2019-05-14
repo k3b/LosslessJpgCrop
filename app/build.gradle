@@ -11,8 +11,9 @@ android {
 
         // 1.0.0.190425 (1)    initial version
         // 1.0.1.190507 (2)    Bugfix: missing read permission; port to android-x
-        versionCode 2
-        versionName "1.0.1.190507"
+        // 1.0.2.190515 (3)    Bugfix: rotation; illegal filename
+        versionCode 3
+        versionName "1.0.2.190515"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
         // all supported locales. Note: the lib has more translations which are supressed here
