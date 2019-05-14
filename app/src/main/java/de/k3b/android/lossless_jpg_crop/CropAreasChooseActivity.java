@@ -9,6 +9,8 @@ import android.os.Build;
 import android.os.Bundle;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.FileProvider;
+
+import android.provider.DocumentsContract;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -27,6 +29,8 @@ import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 
 public class CropAreasChooseActivity extends BaseActivity  {
+    private static int lastInstanceNo = 0;
+    private int instanceNo = 0;
     private static final String TAG = "llCrop";
     private static final int REQUEST_GET_PICTURE = 1;
     protected static final int REQUEST_GET_PICTURE_PERMISSION = 101;
@@ -41,6 +45,7 @@ public class CropAreasChooseActivity extends BaseActivity  {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        instanceNo = ++lastInstanceNo;
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -49,7 +54,7 @@ public class CropAreasChooseActivity extends BaseActivity  {
         Uri uri = getIntent().getData();
 
         if (uri == null) {
-            Log.d(TAG, "Intent.data has not initial image uri. Opening Image Picker");
+            Log.d(TAG, getInstanceNo() + "Intent.data has not initial image uri. Opening Image Picker");
             // must be called with image uri
             pickFromGallery();
         } else {
@@ -64,13 +69,17 @@ public class CropAreasChooseActivity extends BaseActivity  {
                 */
                 uCropView.setImageUriAsync(uri);
 
-                Rect crop = (Rect) ((savedInstanceState == null)
+                final boolean noPreviousInstanceState = savedInstanceState == null;
+                Rect crop = (Rect) (noPreviousInstanceState
                         ? null
                         : savedInstanceState.getParcelable(CURRENT_CROP_AREA));
 
+                Log.d(TAG, getInstanceNo() + "onCreate(savedInstanceState:" + !noPreviousInstanceState +
+                        "): crop=" + crop);
+
                 uCropView.setCropRect(crop);
             } catch (Exception e) {
-                final String msg = "setImageUri '" + uri + "' ";
+                final String msg = getInstanceNo() + "setImageUri '" + uri + "' ";
                 Log.e(TAG, msg, e);
                 Toast.makeText(this, msg + e.getMessage(), Toast.LENGTH_LONG).show();
             }
@@ -78,11 +87,16 @@ public class CropAreasChooseActivity extends BaseActivity  {
 
     }
 
+    private String getInstanceNo() {
+        return "#" + instanceNo + ":";
+    }
+
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
 
         Rect crop = getCropRect();
+        Log.d(TAG, getInstanceNo() + "onSaveInstanceState : crop=" + crop);
         outState.putParcelable(CURRENT_CROP_AREA, crop);
     }
 
@@ -160,9 +174,11 @@ public class CropAreasChooseActivity extends BaseActivity  {
                     getString(R.string.permission_read_storage_rationale),
                     REQUEST_GET_PICTURE_PERMISSION);
         } else {
-            Log.d(TAG, "Opening Image Picker");
+            Log.d(TAG, getInstanceNo() + "Opening Image Picker");
             Intent intent = new Intent(Intent.ACTION_GET_CONTENT)
                     .setType(IMAGE_JPEG_MIME)
+                    .putExtra(Intent.EXTRA_TITLE, getString(R.string.label_select_picture))
+                    .putExtra(DocumentsContract.EXTRA_PROMPT, getString(R.string.label_select_picture))
                     .addCategory(Intent.CATEGORY_OPENABLE)
                     ;
 
@@ -173,7 +189,7 @@ public class CropAreasChooseActivity extends BaseActivity  {
         if (resultCode == RESULT_OK) {
             final Uri selectedUri = (data == null) ? null : data.getData();
             if (selectedUri != null) {
-                Log.d(TAG, "Restarting with uri '" + selectedUri + "'");
+                Log.d(TAG, getInstanceNo() + "Restarting with uri '" + selectedUri + "'");
 
                 Intent intent = new Intent(Intent.ACTION_VIEW, selectedUri, this, CropAreasChooseActivity.class);
                 intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
@@ -183,7 +199,7 @@ public class CropAreasChooseActivity extends BaseActivity  {
                 return;
             }
         }
-        Log.d(TAG, this.getString(R.string.toast_cannot_retrieve_selected_image));
+        Log.d(TAG,getInstanceNo() +  this.getString(R.string.toast_cannot_retrieve_selected_image));
         Toast.makeText(this, R.string.toast_cannot_retrieve_selected_image, Toast.LENGTH_SHORT).show();
         finish();
         return;
@@ -205,17 +221,21 @@ public class CropAreasChooseActivity extends BaseActivity  {
         Uri inUri = getIntent().getData();
         String originalFileName = (inUri == null) ? "" : inUri.getLastPathSegment();
         String proposedFileName = replaceExtension(originalFileName, "_llcrop.jpg");
+        // String proposedOutPath = inUri.getP new Uri() replaceExtension(originalFileName, "_llcrop.jpg");
 
+
+        // DocumentsContract#EXTRA_INITIAL_URI
         Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT)
                             .setType(IMAGE_JPEG_MIME)
                             .addCategory(Intent.CATEGORY_OPENABLE)
                             .putExtra(Intent.EXTRA_TITLE, proposedFileName)
+                            .putExtra(DocumentsContract.EXTRA_PROMPT, getString(R.string.label_save_as))
                             .setFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION
                                 | Intent.FLAG_GRANT_WRITE_URI_PERMISSION
                                 | Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION)
                             ;
 
-        Log.d(TAG, "openPublicOutputUriPicker '" + proposedFileName + "'");
+        Log.d(TAG, getInstanceNo() + "openPublicOutputUriPicker '" + proposedFileName + "'");
 
         startActivityForResult(intent, folderpickerCode);
         return true;
@@ -230,7 +250,7 @@ public class CropAreasChooseActivity extends BaseActivity  {
             InputStream inStream = null;
             OutputStream outStream = null;
 
-            final String context_message = "Cropping '" + inUri + "'(" + rect + ") => '"
+            final String context_message = getInstanceNo() + "Cropping '" + inUri + "'(" + rect + ") => '"
                     + outUri + "' ('" + toString(outUri) + "')";
             Log.i(TAG, context_message);
 
@@ -253,7 +273,7 @@ public class CropAreasChooseActivity extends BaseActivity  {
             }
         } else {
             // uri==null or error
-            Log.i(TAG, "onOpenPublicOutputUriPickerResult(null): No output url, not saved.");
+            Log.i(TAG, getInstanceNo() + "onOpenPublicOutputUriPickerResult(null): No output url, not saved.");
         }
     }
 
@@ -264,17 +284,17 @@ public class CropAreasChooseActivity extends BaseActivity  {
             return URLDecoder.decode(outUri.toString(), StandardCharsets.UTF_8.toString());
         } catch (Exception e) {
             //!!! UnsupportedEncodingException, IllegalCharsetNameException
-            Log.e(TAG, "err cannot convert uri to string('" + outUri.toString() + "').", e);
+            Log.e(TAG, getInstanceNo() + "err cannot convert uri to string('" + outUri.toString() + "').", e);
             return outUri.toString();
         }
     }
 
-    private static void close(Closeable stream, Object source) {
+    private void close(Closeable stream, Object source) {
         if (stream != null) {
             try {
                 stream.close();
             } catch (IOException e) {
-                Log.w(TAG, "Error closing " + source, e);
+                Log.w(TAG, getInstanceNo() + "Error closing " + source, e);
             }
         }
     }
@@ -287,7 +307,10 @@ public class CropAreasChooseActivity extends BaseActivity  {
     }
 
     private Rect getCropRect() {
-        if (uCropView == null) return null;
+        if (uCropView == null) {
+            Log.e(TAG, getInstanceNo() + "ups: no cropView");
+            return null;
+        }
         return uCropView.getCropRect();
     }
 
@@ -335,7 +358,7 @@ public class CropAreasChooseActivity extends BaseActivity  {
         InputStream inStream = null;
         OutputStream outStream = null;
 
-        final String context_message = "Cropping '" + inUri + "'(" + rect + ")";
+        final String context_message = getInstanceNo() + "Cropping '" + inUri + "'(" + rect + ")";
         Log.d(TAG, context_message);
 
         try {
@@ -370,7 +393,7 @@ public class CropAreasChooseActivity extends BaseActivity  {
             return sharedFileUri;
 
         } catch (Exception e) {
-            Log.e(TAG, e.getMessage(), e);
+            Log.e(TAG, getInstanceNo() + e.getMessage(), e);
             return null;
         }
 		
