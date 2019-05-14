@@ -259,9 +259,12 @@ public class CropAreasChooseActivity extends BaseActivity  {
 
     private String toString(Uri outUri) {
         if (outUri == null) return "";
+        // may crash with "IllegalCharsetNameException" in https://github.com/k3b/LosslessJpgCrop/issues/7
         try {
             return URLDecoder.decode(outUri.toString(), StandardCharsets.UTF_8.toString());
-        } catch (UnsupportedEncodingException e) {
+        } catch (Exception e) {
+            //!!! UnsupportedEncodingException, IllegalCharsetNameException
+            Log.e(TAG, "err cannot convert uri to string('" + outUri.toString() + "').", e);
             return outUri.toString();
         }
     }
