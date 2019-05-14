@@ -1,0 +1,3 @@
+Bugfixes: 
+#7: illegal chars in filename: ':', non-utf8; 
+#6: rotation prevents save

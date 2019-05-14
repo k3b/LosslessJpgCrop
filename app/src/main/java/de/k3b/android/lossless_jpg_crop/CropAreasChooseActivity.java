@@ -70,14 +70,12 @@ public class CropAreasChooseActivity extends BaseActivity  {
                 uCropView.setImageUriAsync(uri);
 
                 final boolean noPreviousInstanceState = savedInstanceState == null;
-                Rect crop = (Rect) (noPreviousInstanceState
+                final Rect crop = (Rect) (noPreviousInstanceState
                         ? null
                         : savedInstanceState.getParcelable(CURRENT_CROP_AREA));
 
-                Log.d(TAG, getInstanceNo() + "onCreate(savedInstanceState:" + !noPreviousInstanceState +
-                        "): crop=" + crop);
+                setCropRect(crop);
 
-                uCropView.setCropRect(crop);
             } catch (Exception e) {
                 final String msg = getInstanceNo() + "setImageUri '" + uri + "' ";
                 Log.e(TAG, msg, e);
@@ -85,6 +83,36 @@ public class CropAreasChooseActivity extends BaseActivity  {
             }
         }
 
+    }
+
+    // #7: workaround rotation change while picker is open causes Activity re-create without
+    // uCropView recreation completed.
+    private Rect mLastCropRect = null;
+    private void setCropRect(final Rect crop) {
+        if (crop != null) {
+            mLastCropRect = crop;
+            uCropView.setCropRect(crop);
+
+            uCropView.setOnSetImageUriCompleteListener(new CropImageView.OnSetImageUriCompleteListener() {
+                @Override
+                public void onSetImageUriComplete(CropImageView view, Uri uri, Exception error) {
+                    // called when uCropView recreation is completed.
+                    uCropView.setCropRect(crop);
+                    Rect newCrop = getCropRect();
+                    Log.d(TAG, getInstanceNo() + "delayed onCreate(): crop=" + crop + "/" + newCrop);
+                    uCropView.setOnSetImageUriCompleteListener(null);
+                }
+            });
+        }
+    }
+
+    private Rect getCropRect() {
+        if (uCropView == null) {
+            Log.e(TAG, getInstanceNo() + "ups: no cropView");
+            return null;
+        }
+        final Rect cropRect = uCropView.getCropRect();
+        return (cropRect != null) ? cropRect : mLastCropRect;
     }
 
     private String getInstanceNo() {
@@ -304,14 +332,6 @@ public class CropAreasChooseActivity extends BaseActivity  {
         if (path == null) return null;
         int ext = path.lastIndexOf(".");
         return ((ext >= 0) ? path.substring(0, ext) : path) + extension;
-    }
-
-    private Rect getCropRect() {
-        if (uCropView == null) {
-            Log.e(TAG, getInstanceNo() + "ups: no cropView");
-            return null;
-        }
-        return uCropView.getCropRect();
     }
 
     /**
