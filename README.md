@@ -12,6 +12,6 @@ the need for jpg-image-re-encoding. It also preserves embedded meta data (Exif/I
 
 ---
 
-The app is available on [f-droid app store](https://f-droid.org/en/packages/de.k3b.android.lossless_jpg_crop) but not on google-play.
+[<img src="https://github.com/k3b/APhotoManager/wiki/fdroid.png" alt="available on F-Droid app store" height="82" width="324">](https://f-droid.org/en/packages/de.k3b.android.lossless_jpg_crop)
 
-Please wait for the bugfix-version "1.0.2.190515" which should be available in few hours.
+Please wait for the fdroid-bugfix-version "1.0.2.190515" which should be available in few hours.
