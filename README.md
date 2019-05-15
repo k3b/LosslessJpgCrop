@@ -9,3 +9,9 @@ jpg-re-encoding](https://en.wikipedia.org/wiki/Lossy_compression).
 llCrop ("ll" stands for loss-less) can do [cropping without quality-losses](https://en.wikipedia.org/wiki/Lossy_compression#JPEG) because it crops 
 in the raw jpg-photo-data without 
 the need for jpg-image-re-encoding. It also preserves embedded meta data (Exif/Iptc and xmp)
+
+---
+
+The app is available on [f-droid app store](https://f-droid.org/en/packages/de.k3b.android.lossless_jpg_crop) but not on google-play.
+
+Please wait for the bugfix-version "1.0.2.190515" which should be available in few hours.
