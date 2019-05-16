@@ -33,13 +33,14 @@ abstract class CropAreasChooseBaseActivity extends BaseActivity  {
     private static int lastInstanceNo = 0;
     private int instanceNo = 0;
     protected static final String TAG = "llCrop";
-    private static final int REQUEST_GET_PICTURE = 1;
+
+    protected static final int REQUEST_GET_PICTURE = 1;
     protected static final int REQUEST_GET_PICTURE_PERMISSION = 101;
 
     private static final String CURRENT_CROP_AREA = "CURRENT_CROP_AREA";
     protected static final String IMAGE_JPEG_MIME = "image/jpeg";
 
-    private CropImageView uCropView = null;
+    protected CropImageView uCropView = null;
     private ImageProcessor mSpectrum;
 
     @Override
@@ -47,41 +48,38 @@ abstract class CropAreasChooseBaseActivity extends BaseActivity  {
         instanceNo = ++lastInstanceNo;
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_crop);
+        uCropView = findViewById(R.id.ucrop);
 
         mSpectrum = new ImageProcessor();
 
-        Uri uri = getIntent().getData();
+    }
 
-        if (uri == null) {
-            Log.d(TAG, getInstanceNo() + "Intent.data has not initial image uri. Opening Image Picker");
-            // must be called with image uri
-            pickFromGallery();
-        } else {
-            try {
-                uCropView = findViewById(R.id.ucrop);
+    protected void SetImageUriAndLastCropArea(Uri uri, Bundle savedInstanceState) {
+        try {
 
-                /*
-                InputStream stream = getContentResolver().openInputStream(uri);
-                Bitmap bitmap = BitmapFactory.decodeStream(stream);
+            /*
+            InputStream stream = getContentResolver().openInputStream(uri);
+            Bitmap bitmap = BitmapFactory.decodeStream(stream);
 
-                uCropView.setImageBitmap(bitmap);
-                */
-                uCropView.setImageUriAsync(uri);
+            uCropView.setImageBitmap(bitmap);
+            */
+            uCropView.setImageUriAsync(uri);
 
-                final boolean noPreviousInstanceState = savedInstanceState == null;
-                final Rect crop = (Rect) (noPreviousInstanceState
-                        ? null
-                        : savedInstanceState.getParcelable(CURRENT_CROP_AREA));
+            final Rect crop = (Rect) ((savedInstanceState == null)
+                    ? null
+                    : savedInstanceState.getParcelable(CURRENT_CROP_AREA));
 
-                setCropRect(crop);
+            setCropRect(crop);
 
-            } catch (Exception e) {
-                final String msg = getInstanceNo() + "setImageUri '" + uri + "' ";
-                Log.e(TAG, msg, e);
-                Toast.makeText(this, msg + e.getMessage(), Toast.LENGTH_LONG).show();
-            }
+        } catch (Exception e) {
+            final String msg = getInstanceNo() + "setImageUri '" + uri + "' ";
+            Log.e(TAG, msg, e);
+            Toast.makeText(this, msg + e.getMessage(), Toast.LENGTH_LONG).show();
         }
+    }
 
+    protected Uri getSourceImageUri(Intent intent) {
+        return intent.getData();
     }
 
     // #7: workaround rotation change while picker is open causes Activity re-create without
@@ -191,7 +189,7 @@ abstract class CropAreasChooseBaseActivity extends BaseActivity  {
         }
     }
 
-    private void pickFromGallery() {
+    protected void pickFromGallery(int REQUEST_GET_PICTURE) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN
                 && ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED) {
@@ -209,25 +207,6 @@ abstract class CropAreasChooseBaseActivity extends BaseActivity  {
 
             startActivityForResult(Intent.createChooser(intent, getString(R.string.label_select_picture)), REQUEST_GET_PICTURE);
         }
-    }
-    private void onGetPictureResult(int resultCode, Intent data) {
-        if (resultCode == RESULT_OK) {
-            final Uri selectedUri = (data == null) ? null : data.getData();
-            if (selectedUri != null) {
-                Log.d(TAG, getInstanceNo() + "Restarting with uri '" + selectedUri + "'");
-
-                Intent intent = new Intent(Intent.ACTION_VIEW, selectedUri, this, CropAreasEditActivity.class);
-                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-
-                this.startActivity(intent);
-                finish();
-                return;
-            }
-        }
-        Log.d(TAG,getInstanceNo() +  this.getString(R.string.toast_cannot_retrieve_selected_image));
-        Toast.makeText(this, R.string.toast_cannot_retrieve_selected_image, Toast.LENGTH_SHORT).show();
-        finish();
-        return;
     }
 
     protected String toString(Uri outUri) {
@@ -260,7 +239,7 @@ abstract class CropAreasChooseBaseActivity extends BaseActivity  {
         switch (requestCode) {
             case REQUEST_GET_PICTURE_PERMISSION:
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    pickFromGallery();
+                    pickFromGallery(REQUEST_GET_PICTURE);
                 }
                 break;
             default:
@@ -271,17 +250,12 @@ abstract class CropAreasChooseBaseActivity extends BaseActivity  {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_GET_PICTURE) {
-            onGetPictureResult(resultCode, data);
-            return;
-        }
-
         super.onActivityResult(requestCode, resultCode, data);
     }
 
     private Uri __delete_saveAsPrivate() {
 
-        final Uri inUri = getIntent().getData();
+        final Uri inUri = getSourceImageUri(getIntent());
         Rect rect = getCropRect();
         InputStream inStream = null;
         OutputStream outStream = null;

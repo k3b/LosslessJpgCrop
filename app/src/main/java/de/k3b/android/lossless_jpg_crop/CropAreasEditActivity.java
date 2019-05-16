@@ -24,7 +24,17 @@ public class CropAreasEditActivity extends CropAreasChooseBaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Uri uri = getSourceImageUri(getIntent());
+
+        if (uri == null) {
+            Log.d(TAG, getInstanceNo() + "Intent.data has not initial image uri. Opening Image Picker");
+            // must be called with image uri
+            pickFromGallery(REQUEST_GET_PICTURE);
+        } else {
+            SetImageUriAndLastCropArea(uri, savedInstanceState);
+        }
     }
+
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
@@ -66,6 +76,11 @@ public class CropAreasEditActivity extends CropAreasChooseBaseActivity {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_GET_PICTURE) {
+            onGetPictureResult(resultCode, data);
+            return;
+        }
+
         if (requestCode == REQUEST_SAVE_PICTURE) {
             final Uri outUri = (data == null) ? null : data.getData();
             onOpenPublicOutputUriPickerResult(resultCode, outUri);
@@ -145,6 +160,26 @@ public class CropAreasEditActivity extends CropAreasChooseBaseActivity {
             // uri==null or error
             Log.i(TAG, getInstanceNo() + "onOpenPublicOutputUriPickerResult(null): No output url, not saved.");
         }
+    }
+
+    private void onGetPictureResult(int resultCode, Intent data) {
+        if (resultCode == RESULT_OK) {
+            final Uri selectedUri = (data == null) ? null : getSourceImageUri(data);
+            if (selectedUri != null) {
+                Log.d(TAG, getInstanceNo() + "Restarting with uri '" + selectedUri + "'");
+
+                Intent intent = new Intent(Intent.ACTION_EDIT, selectedUri, this, CropAreasEditActivity.class);
+                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+                this.startActivity(intent);
+                finish();
+                return;
+            }
+        }
+        Log.d(TAG,getInstanceNo() +  this.getString(R.string.toast_cannot_retrieve_selected_image));
+        Toast.makeText(this, R.string.toast_cannot_retrieve_selected_image, Toast.LENGTH_SHORT).show();
+        finish();
+        return;
     }
 
     /** replaceExtension("/path/to/image.jpg", ".xmp") becomes "/path/to/image.xmp" */
