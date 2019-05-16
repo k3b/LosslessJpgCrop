@@ -32,14 +32,12 @@ import java.nio.charset.StandardCharsets;
 abstract class CropAreasChooseBaseActivity extends BaseActivity  {
     private static int lastInstanceNo = 0;
     private int instanceNo = 0;
-    private static final String TAG = "llCrop";
+    protected static final String TAG = "llCrop";
     private static final int REQUEST_GET_PICTURE = 1;
     protected static final int REQUEST_GET_PICTURE_PERMISSION = 101;
 
-    private static final int REQUEST_SAVE_PICTURE = 2;
-    private static final int REQUEST_SAVE_PICTURE_PERMISSION = 102;
     private static final String CURRENT_CROP_AREA = "CURRENT_CROP_AREA";
-    private static final String IMAGE_JPEG_MIME = "image/jpeg";
+    protected static final String IMAGE_JPEG_MIME = "image/jpeg";
 
     private CropImageView uCropView = null;
     private ImageProcessor mSpectrum;
@@ -107,7 +105,7 @@ abstract class CropAreasChooseBaseActivity extends BaseActivity  {
         }
     }
 
-    private Rect getCropRect() {
+    protected Rect getCropRect() {
         if (uCropView == null) {
             Log.e(TAG, getInstanceNo() + "ups: no cropView");
             return null;
@@ -116,7 +114,7 @@ abstract class CropAreasChooseBaseActivity extends BaseActivity  {
         return (cropRect != null) ? cropRect : mLastCropRect;
     }
 
-    private String getInstanceNo() {
+    protected String getInstanceNo() {
         return "#" + instanceNo + ":";
     }
 
@@ -152,9 +150,7 @@ abstract class CropAreasChooseBaseActivity extends BaseActivity  {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.menu_save:
-                return saveAsPublicCroppedImage();
-/*				
+/*
             case R.id.menu_send: {
                 createSendIntend(true);
 
@@ -234,79 +230,7 @@ abstract class CropAreasChooseBaseActivity extends BaseActivity  {
         return;
     }
 
-    private boolean saveAsPublicCroppedImage() {
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                != PackageManager.PERMISSION_GRANTED) {
-            requestPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                    getString(R.string.permission_write_storage_rationale),
-                    REQUEST_SAVE_PICTURE_PERMISSION);
-        } else {
-            openPublicOutputUriPicker(REQUEST_SAVE_PICTURE);
-        }
-        return true;
-    }
-
-    private boolean openPublicOutputUriPicker(int folderpickerCode) {
-        Uri inUri = getIntent().getData();
-        String originalFileName = (inUri == null) ? "" : inUri.getLastPathSegment();
-        String proposedFileName = replaceExtension(originalFileName, "_llcrop.jpg");
-        // String proposedOutPath = inUri.getP new Uri() replaceExtension(originalFileName, "_llcrop.jpg");
-
-
-        // DocumentsContract#EXTRA_INITIAL_URI
-        Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT)
-                            .setType(IMAGE_JPEG_MIME)
-                            .addCategory(Intent.CATEGORY_OPENABLE)
-                            .putExtra(Intent.EXTRA_TITLE, proposedFileName)
-                            .putExtra(DocumentsContract.EXTRA_PROMPT, getString(R.string.label_save_as))
-                            .setFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION
-                                | Intent.FLAG_GRANT_WRITE_URI_PERMISSION
-                                | Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION)
-                            ;
-
-        Log.d(TAG, getInstanceNo() + "openPublicOutputUriPicker '" + proposedFileName + "'");
-
-        startActivityForResult(intent, folderpickerCode);
-        return true;
-    }
-
-    private void onOpenPublicOutputUriPickerResult(int resultCode, Uri outUri) {
-        final Intent intent = getIntent();
-        final Uri inUri = ((resultCode == RESULT_OK) && (intent != null)) ? intent.getData() : null;
-
-        if (inUri != null) {
-            Rect rect = getCropRect();
-            InputStream inStream = null;
-            OutputStream outStream = null;
-
-            final String context_message = getInstanceNo() + "Cropping '" + inUri + "'(" + rect + ") => '"
-                    + outUri + "' ('" + toString(outUri) + "')";
-            Log.i(TAG, context_message);
-
-            try {
-                inStream = getContentResolver().openInputStream(inUri);
-                outStream = getContentResolver().openOutputStream(outUri, "w");
-                this.mSpectrum.crop(inStream, outStream, rect, 0);
-
-                String message = getString(R.string.toast_saved_as,
-                        toString(outUri));
-                Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
-
-                finish();
-                return;
-            } catch (Exception e) {
-                Log.e(TAG, "Error " + context_message + e.getMessage(), e);
-            } finally {
-                close(outStream, outStream);
-                close(inStream, inStream);
-            }
-        } else {
-            // uri==null or error
-            Log.i(TAG, getInstanceNo() + "onOpenPublicOutputUriPickerResult(null): No output url, not saved.");
-        }
-    }
-
-    private String toString(Uri outUri) {
+    protected String toString(Uri outUri) {
         if (outUri == null) return "";
         // may crash with "IllegalCharsetNameException" in https://github.com/k3b/LosslessJpgCrop/issues/7
         try {
@@ -318,7 +242,7 @@ abstract class CropAreasChooseBaseActivity extends BaseActivity  {
         }
     }
 
-    private void close(Closeable stream, Object source) {
+    protected void close(Closeable stream, Object source) {
         if (stream != null) {
             try {
                 stream.close();
@@ -326,13 +250,6 @@ abstract class CropAreasChooseBaseActivity extends BaseActivity  {
                 Log.w(TAG, getInstanceNo() + "Error closing " + source, e);
             }
         }
-    }
-
-    /** replaceExtension("/path/to/image.jpg", ".xmp") becomes "/path/to/image.xmp" */
-    private static String replaceExtension(String path, String extension) {
-        if (path == null) return null;
-        int ext = path.lastIndexOf(".");
-        return ((ext >= 0) ? path.substring(0, ext) : path) + extension;
     }
 
     /**
@@ -346,11 +263,6 @@ abstract class CropAreasChooseBaseActivity extends BaseActivity  {
                     pickFromGallery();
                 }
                 break;
-            case REQUEST_SAVE_PICTURE_PERMISSION:
-                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    saveAsPublicCroppedImage();
-                }
-                break;
             default:
                 super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
@@ -361,11 +273,6 @@ abstract class CropAreasChooseBaseActivity extends BaseActivity  {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_GET_PICTURE) {
             onGetPictureResult(resultCode, data);
-            return;
-        }
-        if (requestCode == REQUEST_SAVE_PICTURE) {
-            final Uri outUri = (data == null) ? null : data.getData();
-            onOpenPublicOutputUriPickerResult(resultCode, outUri);
             return;
         }
 
@@ -388,7 +295,7 @@ abstract class CropAreasChooseBaseActivity extends BaseActivity  {
             sharedFolder.mkdirs();
             outStream = new FileOutputStream(sharedFile);
             inStream = getContentResolver().openInputStream(inUri);
-            this.mSpectrum.crop(inStream, outStream, rect, 0);
+            crop(inStream, outStream, rect);
 
             Uri sharedFileUri = FileProvider.getUriForFile(this, "de.k3b.llCrop", sharedFile);
 
@@ -401,6 +308,10 @@ abstract class CropAreasChooseBaseActivity extends BaseActivity  {
             close(inStream, inStream);
         }
 
+    }
+
+    protected void crop(InputStream inStream, OutputStream outStream, Rect rect) {
+        this.mSpectrum.crop(inStream, outStream, rect, 0);
     }
 
     private Uri createPrivateOutUriOrNull() {
