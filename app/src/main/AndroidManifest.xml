@@ -25,7 +25,7 @@
                 android:resource="@xml/file_provider_paths"/>
         </provider>
 
-        <activity android:name=".CropAreasChooseActivity">
+        <activity android:name=".CropAreasEditActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

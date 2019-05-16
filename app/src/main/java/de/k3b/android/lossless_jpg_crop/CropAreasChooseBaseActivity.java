@@ -24,11 +24,12 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
+
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 
-public class CropAreasChooseActivity extends BaseActivity  {
+/** base cropping functionality for all different workflows */
+abstract class CropAreasChooseBaseActivity extends BaseActivity  {
     private static int lastInstanceNo = 0;
     private int instanceNo = 0;
     private static final String TAG = "llCrop";
@@ -47,7 +48,7 @@ public class CropAreasChooseActivity extends BaseActivity  {
     protected void onCreate(Bundle savedInstanceState) {
         instanceNo = ++lastInstanceNo;
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_crop);
 
         mSpectrum = new ImageProcessor();
 
@@ -219,7 +220,7 @@ public class CropAreasChooseActivity extends BaseActivity  {
             if (selectedUri != null) {
                 Log.d(TAG, getInstanceNo() + "Restarting with uri '" + selectedUri + "'");
 
-                Intent intent = new Intent(Intent.ACTION_VIEW, selectedUri, this, CropAreasChooseActivity.class);
+                Intent intent = new Intent(Intent.ACTION_VIEW, selectedUri, this, CropAreasEditActivity.class);
                 intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 
                 this.startActivity(intent);

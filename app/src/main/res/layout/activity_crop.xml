@@ -5,22 +5,9 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".CropAreasChooseActivity"
+    tools:context=".CropAreasEditActivity"
     >
-
-    <!--
-    <com.yalantis.ucrop.view.UCropView
-        android:id="@+id/ucrop"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
-    <com.edmodo.cropper.CropImageView
-        android:id="@+id/ucrop"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        />
--->
-
-    <net.realify.lib.androidimagecropper.CropImageView
+   <net.realify.lib.androidimagecropper.CropImageView
         android:id="@+id/ucrop"
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
