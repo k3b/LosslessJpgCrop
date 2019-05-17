@@ -62,6 +62,14 @@ abstract class CropAreasChooseBaseActivity extends BaseActivity  {
     }
 
     protected void SetImageUriAndLastCropArea(Uri uri, Bundle savedInstanceState) {
+        final Rect crop = (Rect) ((savedInstanceState == null)
+                ? null
+                : savedInstanceState.getParcelable(CURRENT_CROP_AREA));
+
+        SetImageUriAndLastCropArea(uri, crop);
+    }
+
+    protected void SetImageUriAndLastCropArea(Uri uri, Rect crop) {
         try {
 
             /*
@@ -71,10 +79,6 @@ abstract class CropAreasChooseBaseActivity extends BaseActivity  {
             uCropView.setImageBitmap(bitmap);
             */
             uCropView.setImageUriAsync(uri);
-
-            final Rect crop = (Rect) ((savedInstanceState == null)
-                    ? null
-                    : savedInstanceState.getParcelable(CURRENT_CROP_AREA));
 
             setCropRect(crop);
 

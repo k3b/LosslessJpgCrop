@@ -9,9 +9,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 /**
- * #2: SEND/SENDTO(uri=sourcePhoto.jpg) => crop => tempfile.jpg => SEND/SENDTO(uri=tempfile.jpg)
+ * Handles ACTION_SENDTO(uri=DATA) and ACTION_SEND(uri=EXTRA_STREAM) to re-send a cropped image
  *
- * Handles ACTION_SENDTO(uri=DATA) and ACTION_SEND(uri=EXTRA_STREAM):
+ * #2: SEND/SENDTO(uri=sourcePhoto.jpg) => crop => tempfile.jpg => SEND/SENDTO(uri=tempfile.jpg)
  */
 public class CropAreasSendActivity extends CropAreasChooseBaseActivity {
     @Override

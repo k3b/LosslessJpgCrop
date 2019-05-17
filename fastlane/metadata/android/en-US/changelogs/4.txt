@@ -1,0 +1,2 @@
+#2: Implemented Workflow: share/SEND/SENDTO to re-send a cropped photo
+#3: Implemented Workflow: GET_CONTENT/PICK to pick a cropped photo
