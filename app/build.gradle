@@ -12,8 +12,9 @@ android {
         // 1.0.0.190425 (1)    initial version
         // 1.0.1.190507 (2)    Bugfix: missing read permission; port to android-x
         // 1.0.2.190515 (3)    Bugfix: rotation; illegal filename
-        versionCode 3
-        versionName "1.0.2.190515"
+        // 1.1.0.190518 (4)    Implemented Workflow: GET_CONTENT/PICK/share/SEND/SENDTO to pick/re-send a cropped photo
+        versionCode 4
+        versionName "1.1.0.190518"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
         // all supported locales. Note: the lib has more translations which are supressed here
