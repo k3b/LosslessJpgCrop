@@ -28,7 +28,9 @@ import java.io.OutputStream;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 
-/** base cropping functionality for all different workflows */
+/** For all different workflows CropAreaXxxxActivity:
+ * * Displays the cropping gui
+ * * Contains Protected helpers for common functionalities */
 abstract class CropAreasChooseBaseActivity extends BaseActivity  {
     private static int lastInstanceNo = 0;
     private int instanceNo = 0;
@@ -79,7 +81,10 @@ abstract class CropAreasChooseBaseActivity extends BaseActivity  {
     }
 
     protected Uri getSourceImageUri(Intent intent) {
-        return intent.getData();
+        if (intent == null) return null;
+
+        Uri uri = intent.getData();
+        return uri;
     }
 
     // #7: workaround rotation change while picker is open causes Activity re-create without
@@ -182,10 +187,12 @@ abstract class CropAreasChooseBaseActivity extends BaseActivity  {
         }
     }
 
-    private static void copyExtra(Intent outIntent, Bundle extras, String... extraIds) {
-        for(String id: extraIds) {
-            String value = extras.getString(id, null);
-            if (value != null) outIntent.putExtra(id, value);
+    protected static void copyExtra(Intent outIntent, Bundle extras, String... extraIds) {
+        if (extras != null) {
+            for (String id : extraIds) {
+                String value = extras.getString(id, null);
+                if (value != null) outIntent.putExtra(id, value);
+            }
         }
     }
 
@@ -264,7 +271,7 @@ abstract class CropAreasChooseBaseActivity extends BaseActivity  {
         Log.d(TAG, context_message);
 
         try {
-            final File sharedFolder = new File(getFilesDir(), "shared");
+            final File sharedFolder = getSharedDir();
             final File sharedFile = File.createTempFile("llCrop_",".jpg", sharedFolder);
             sharedFolder.mkdirs();
             outStream = new FileOutputStream(sharedFile);
@@ -290,7 +297,7 @@ abstract class CropAreasChooseBaseActivity extends BaseActivity  {
 
     private Uri createPrivateOutUriOrNull() {
         try {
-            final File sharedFolder = new File(getFilesDir(), "shared");
+            final File sharedFolder = getSharedDir();
             final File sharedFile = File.createTempFile("llCrop_",".jpg", sharedFolder);
             sharedFolder.mkdirs();
 
@@ -321,6 +328,25 @@ abstract class CropAreasChooseBaseActivity extends BaseActivity  {
             Toast.makeText(parentActivity, idEditError,Toast.LENGTH_LONG).show();
         }
 		*/
+    }
+
+    protected File getSharedDir() {
+        File sharedDir = new File(this.getFilesDir(), "shared");
+        sharedDir.mkdirs();
+        return sharedDir;
+    }
+
+    protected String createCropFileName() {
+        Uri inUri = getSourceImageUri(getIntent());
+        String originalFileName = (inUri == null) ? "" : inUri.getLastPathSegment();
+        return replaceExtension(originalFileName, "_llcrop.jpg");
+    }
+
+    /** replaceExtension("/path/to/image.jpg", ".xmp") becomes "/path/to/image.xmp" */
+    private static String replaceExtension(String path, String extension) {
+        if (path == null) return null;
+        int ext = path.lastIndexOf(".");
+        return ((ext >= 0) ? path.substring(0, ext) : path) + extension;
     }
 
 

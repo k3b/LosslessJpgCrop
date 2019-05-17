@@ -17,6 +17,13 @@ import androidx.core.app.ActivityCompat;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+/**
+ * #1: ACTION_EDIT(uri=sourcePhoto.jpg) => crop => public-file.jpg
+ * #1: ACTION_MAIN => ACTION_EDIT(uri=GetContent(mime=image/jpeg)) => crop => public-file.jpg
+ *
+ * Handles ACTION_EDIT(uri=DATA) and ACTION_MAIN:
+ */
+
 public class CropAreasEditActivity extends CropAreasChooseBaseActivity {
     private static final int REQUEST_SAVE_PICTURE = 2;
     private static final int REQUEST_SAVE_PICTURE_PERMISSION = 102;
@@ -35,10 +42,12 @@ public class CropAreasEditActivity extends CropAreasChooseBaseActivity {
         }
     }
 
+    /*
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
     }
+    */
 
     @Override
     public boolean onCreateOptionsMenu(final Menu menu) {
@@ -82,8 +91,10 @@ public class CropAreasEditActivity extends CropAreasChooseBaseActivity {
         }
 
         if (requestCode == REQUEST_SAVE_PICTURE) {
-            final Uri outUri = (data == null) ? null : data.getData();
-            onOpenPublicOutputUriPickerResult(resultCode, outUri);
+            if (resultCode == RESULT_OK) {
+                final Uri outUri = (data == null) ? null : data.getData();
+                onOpenPublicOutputUriPickerResult(outUri);
+            } else finish();
             return;
         }
 
@@ -103,9 +114,7 @@ public class CropAreasEditActivity extends CropAreasChooseBaseActivity {
     }
 
     private boolean openPublicOutputUriPicker(int folderpickerCode) {
-        Uri inUri = getIntent().getData();
-        String originalFileName = (inUri == null) ? "" : inUri.getLastPathSegment();
-        String proposedFileName = replaceExtension(originalFileName, "_llcrop.jpg");
+        String proposedFileName = createCropFileName();
         // String proposedOutPath = inUri.getP new Uri() replaceExtension(originalFileName, "_llcrop.jpg");
 
 
@@ -126,9 +135,10 @@ public class CropAreasEditActivity extends CropAreasChooseBaseActivity {
         return true;
     }
 
-    private void onOpenPublicOutputUriPickerResult(int resultCode, Uri outUri) {
+    private void onOpenPublicOutputUriPickerResult(Uri outUri) {
         final Intent intent = getIntent();
-        final Uri inUri = ((resultCode == RESULT_OK) && (intent != null)) ? intent.getData() : null;
+
+        final Uri inUri = getSourceImageUri(getIntent());
 
         if (inUri != null) {
             Rect rect = getCropRect();
@@ -182,10 +192,4 @@ public class CropAreasEditActivity extends CropAreasChooseBaseActivity {
         return;
     }
 
-    /** replaceExtension("/path/to/image.jpg", ".xmp") becomes "/path/to/image.xmp" */
-    private static String replaceExtension(String path, String extension) {
-        if (path == null) return null;
-        int ext = path.lastIndexOf(".");
-        return ((ext >= 0) ? path.substring(0, ext) : path) + extension;
-    }
 }

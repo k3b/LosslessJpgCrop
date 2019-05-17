@@ -44,6 +44,8 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test:runner:1.1.0'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.0'
+
+
     // implements lossless croppig
     //  implementation 'com.facebook.spectrum:spectrum-default:1.0.0'
     implementation 'com.facebook.spectrum:spectrum-core:1.0.0'

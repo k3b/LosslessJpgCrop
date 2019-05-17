@@ -6,7 +6,7 @@
 
         android:showAsAction="always"
           android:icon="@android:drawable/ic_menu_share"
-          android:title="@android:string/ok"
+          android:title="@string/label_send"
         tools:ignore="AppCompatResource" />
 
 </menu>

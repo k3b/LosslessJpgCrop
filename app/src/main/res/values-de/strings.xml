@@ -3,6 +3,7 @@
 
     <string name="label_select_picture">Wähle Photo</string>
     <string name="label_save_as">Speichern als</string>
+    <string name="label_send">Senden/Teilen</string>
 
     <string name="permission_title_rationale">Berechtigung erforderlich</string>
     <string name="permission_read_storage_rationale">Benötige Datei-Leserechte um ein Photo zu laden.</string>
