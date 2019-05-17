@@ -2,21 +2,11 @@ package de.k3b.android.lossless_jpg_crop;
 
 import android.content.ClipData;
 import android.content.Intent;
-import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Toast;
-
-import androidx.core.content.FileProvider;
-
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
 
 /**
  * #2: SEND/SENDTO(uri=sourcePhoto.jpg) => crop => tempfile.jpg => SEND/SENDTO(uri=tempfile.jpg)
@@ -28,15 +18,6 @@ public class CropAreasSendActivity extends CropAreasChooseBaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Uri uri = getSourceImageUri(getIntent());
-
-        //
-        /*As of {@link android.os.Build.VERSION_CODES#JELLY_BEAN}, the data
-         * being sent can be supplied through {@link #setClipData(ClipData)}.  This
-         * allows you to use {@link #FLAG_GRANT_READ_URI_PERMISSION} when sharing
-         * content: URIs and other advanced features of {@link ClipData}.  If
-         * using this approach, you still must supply the same data through the
-         * {@link #EXTRA_TEXT} or {@link #EXTRA_STREAM} fields described below
-         * for compatibility with old applications.  */
 
         SetImageUriAndLastCropArea(uri, savedInstanceState);
     }
@@ -75,35 +56,9 @@ public class CropAreasSendActivity extends CropAreasChooseBaseActivity {
     }
 
     private boolean sendPrivateCroppedImage() {
+        Uri outUri = cropToSharedUri();
 
-        final Intent parentIntent = getIntent();
-        final Uri inUri = getSourceImageUri(parentIntent);
-        Uri outUri = null;
-
-        File outFile = new File(getSharedDir(), createCropFileName());
-
-        if (inUri != null) {
-            Rect rect = getCropRect();
-            InputStream inStream = null;
-            OutputStream outStream = null;
-
-            final String context_message = getInstanceNo() + "Cropping '" + inUri + "'(" + rect + ") => '"
-                    + outFile.getName();
-            Log.i(TAG, context_message);
-
-            try {
-                inStream = getContentResolver().openInputStream(inUri);
-                outStream = new FileOutputStream(outFile, false);
-                crop(inStream, outStream, rect);
-
-                outUri = FileProvider.getUriForFile(this, "de.k3b.llCrop", outFile);
-
-            } catch (Exception e) {
-                Log.e(TAG, "Error " + context_message + e.getMessage(), e);
-            } finally {
-                close(outStream, outStream);
-                close(inStream, inStream);
-            }
+        if (outUri != null) {
             boolean isSend = isSendAction();
 
             Intent childSend = new Intent();
@@ -120,7 +75,7 @@ public class CropAreasSendActivity extends CropAreasChooseBaseActivity {
             }
 
             childSend.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-            copyExtra(childSend, parentIntent.getExtras(),
+            copyExtra(childSend, getIntent().getExtras(),
                     Intent.EXTRA_EMAIL, Intent.EXTRA_CC, Intent.EXTRA_BCC, Intent.EXTRA_SUBJECT,
                     Intent.EXTRA_TEXT);
 
@@ -136,9 +91,6 @@ public class CropAreasSendActivity extends CropAreasChooseBaseActivity {
 
             finish();
             return true;
-        } else {
-            // uri==null or error
-            Log.i(TAG, getInstanceNo() + "onOpenPublicOutputUriPickerResult(null): No output url, not saved.");
         }
         return false;
     }
@@ -147,5 +99,14 @@ public class CropAreasSendActivity extends CropAreasChooseBaseActivity {
         Intent i = getIntent();
         String action = (i != null) ? i.getAction() : null;
         return (action != null) && Intent.ACTION_SEND.equalsIgnoreCase(action);
+    }
+
+    private static void copyExtra(Intent outIntent, Bundle extras, String... extraIds) {
+        if (extras != null) {
+            for (String id : extraIds) {
+                String value = extras.getString(id, null);
+                if (value != null) outIntent.putExtra(id, value);
+            }
+        }
     }
 }

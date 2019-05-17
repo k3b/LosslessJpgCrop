@@ -34,7 +34,7 @@ public class CropAreasEditActivity extends CropAreasChooseBaseActivity {
         Uri uri = getSourceImageUri(getIntent());
 
         if (uri == null) {
-            Log.d(TAG, getInstanceNo() + "Intent.data has not initial image uri. Opening Image Picker");
+            Log.d(TAG, getInstanceNo4Debug() + "Intent.data has not initial image uri. Opening Image Picker");
             // must be called with image uri
             pickFromGallery(REQUEST_GET_PICTURE);
         } else {
@@ -129,7 +129,7 @@ public class CropAreasEditActivity extends CropAreasChooseBaseActivity {
                         | Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION)
                 ;
 
-        Log.d(TAG, getInstanceNo() + "openPublicOutputUriPicker '" + proposedFileName + "'");
+        Log.d(TAG, getInstanceNo4Debug() + "openPublicOutputUriPicker '" + proposedFileName + "'");
 
         startActivityForResult(intent, folderpickerCode);
         return true;
@@ -145,7 +145,7 @@ public class CropAreasEditActivity extends CropAreasChooseBaseActivity {
             InputStream inStream = null;
             OutputStream outStream = null;
 
-            final String context_message = getInstanceNo() + "Cropping '" + inUri + "'(" + rect + ") => '"
+            final String context_message = getInstanceNo4Debug() + "Cropping '" + inUri + "'(" + rect + ") => '"
                     + outUri + "' ('" + toString(outUri) + "')";
             Log.i(TAG, context_message);
 
@@ -168,7 +168,7 @@ public class CropAreasEditActivity extends CropAreasChooseBaseActivity {
             }
         } else {
             // uri==null or error
-            Log.i(TAG, getInstanceNo() + "onOpenPublicOutputUriPickerResult(null): No output url, not saved.");
+            Log.i(TAG, getInstanceNo4Debug() + "onOpenPublicOutputUriPickerResult(null): No output url, not saved.");
         }
     }
 
@@ -176,7 +176,7 @@ public class CropAreasEditActivity extends CropAreasChooseBaseActivity {
         if (resultCode == RESULT_OK) {
             final Uri selectedUri = (data == null) ? null : getSourceImageUri(data);
             if (selectedUri != null) {
-                Log.d(TAG, getInstanceNo() + "Restarting with uri '" + selectedUri + "'");
+                Log.d(TAG, getInstanceNo4Debug() + "Restarting with uri '" + selectedUri + "'");
 
                 Intent intent = new Intent(Intent.ACTION_EDIT, selectedUri, this, CropAreasEditActivity.class);
                 intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
@@ -186,7 +186,7 @@ public class CropAreasEditActivity extends CropAreasChooseBaseActivity {
                 return;
             }
         }
-        Log.d(TAG,getInstanceNo() +  this.getString(R.string.toast_cannot_retrieve_selected_image));
+        Log.d(TAG, getInstanceNo4Debug() +  this.getString(R.string.toast_cannot_retrieve_selected_image));
         Toast.makeText(this, R.string.toast_cannot_retrieve_selected_image, Toast.LENGTH_SHORT).show();
         finish();
         return;
