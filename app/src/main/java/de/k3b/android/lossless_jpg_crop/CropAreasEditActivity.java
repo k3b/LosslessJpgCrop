@@ -7,6 +7,7 @@ import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.DocumentsContract;
+import android.provider.DocumentsProvider;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -135,7 +136,13 @@ public class CropAreasEditActivity extends CropAreasChooseBaseActivity {
         return true;
     }
 
-    private void onOpenPublicOutputUriPickerResult(Uri outUri) {
+    private void onOpenPublicOutputUriPickerResult(Uri _outUri) {
+
+        // use to provoke an error to test error handling
+        // Uri outUri = Uri.parse(_outUri + "-err");
+
+        Uri outUri = _outUri;
+
         final Intent intent = getIntent();
 
         final Uri inUri = getSourceImageUri(getIntent());
@@ -161,7 +168,22 @@ public class CropAreasEditActivity extends CropAreasChooseBaseActivity {
                 finish();
                 return;
             } catch (Exception e) {
+                close(outStream, outStream);
+
                 Log.e(TAG, "Error " + context_message + e.getMessage(), e);
+
+                try {
+                    // #14: delete affected file as it is useless
+                    DocumentsContract.deleteDocument(getContentResolver(), _outUri);
+                } catch (Exception exDelete) {
+                    // ignore if useless file cannot be deleted
+                }
+
+                Log.e(TAG, "Error " + context_message + "(" + outUri +") => " + e.getMessage(), e);
+                Toast.makeText(this,
+                        getString(R.string.toast_saved_error, toString(outUri), e.getMessage()),
+                        Toast.LENGTH_LONG).show();
+
             } finally {
                 close(outStream, outStream);
                 close(inStream, inStream);

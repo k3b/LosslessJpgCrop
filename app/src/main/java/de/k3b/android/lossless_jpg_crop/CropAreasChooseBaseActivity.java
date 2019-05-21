@@ -225,7 +225,7 @@ abstract class CropAreasChooseBaseActivity extends BaseActivity  {
         super.onActivityResult(requestCode, resultCode, data);
     }
 
-    protected void crop(InputStream inStream, OutputStream outStream, Rect rect) {
+    protected void crop(InputStream inStream, OutputStream outStream, Rect rect) throws IOException {
         this.mSpectrum.crop(inStream, outStream, rect, 0);
     }
 
@@ -276,7 +276,13 @@ abstract class CropAreasChooseBaseActivity extends BaseActivity  {
                 outUri = FileProvider.getUriForFile(this, "de.k3b.llCrop", outFile);
 
             } catch (Exception e) {
+                // #14: delete affected file as it is useless
+                close(outStream, outStream);
+                outFile.delete();
                 Log.e(TAG, "Error " + context_message + "(" + outUri +") => " + e.getMessage(), e);
+                Toast.makeText(this,
+                        getString(R.string.toast_saved_error, outFile.getAbsolutePath(), e.getMessage()),
+                        Toast.LENGTH_LONG).show();
             } finally {
                 close(outStream, outStream);
                 close(inStream, inStream);

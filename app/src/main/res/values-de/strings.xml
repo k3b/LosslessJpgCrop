@@ -11,4 +11,5 @@
 
     <string name="toast_cannot_retrieve_selected_image">Beende app: Kein Quell Photo ausgewählt</string>
     <string name="toast_saved_as">Gespeichert als \'%1$s\'</string>
+    <string name="toast_saved_error">Kann nicht speichern unter \'%1$s\'.\n\n%2$s</string>
 </resources>

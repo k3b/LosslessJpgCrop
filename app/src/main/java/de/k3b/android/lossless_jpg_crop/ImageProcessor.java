@@ -16,6 +16,7 @@ import com.facebook.spectrum.options.TranscodeOptions;
 import com.facebook.spectrum.plugins.SpectrumPluginJpeg;
 import com.facebook.spectrum.requirements.EncodeRequirement;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
@@ -34,11 +35,11 @@ public class ImageProcessor {
         // DefaultPlugins.get()); // JPEG, PNG and WebP plugins
     }
 
-    public void crop(InputStream inputStream, OutputStream outputStream, Rect rect, int degrees) {
+    public void crop(InputStream inputStream, OutputStream outputStream, Rect rect, int degrees)  throws IOException {
         crop(inputStream, outputStream, rect.left, rect.top, rect.right, rect.bottom, degrees);
     }
 
-    public void crop(InputStream inputStream, OutputStream outputStream, int left, int top, int right, int bottom, int degrees) {
+    public void crop(InputStream inputStream, OutputStream outputStream, int left, int top, int right, int bottom, int degrees) throws IOException {
         final EncodeRequirement encoding =
                 new EncodeRequirement(EncodedImageFormat.JPEG, 80, EncodeRequirement.Mode.LOSSLESS);
         try {
@@ -54,7 +55,7 @@ public class ImageProcessor {
                             .build(),
                     "my_callsite_identifier");
         } catch (Exception ex) {
-            throw new RuntimeException("Cannot Transcode from " + inputStream + " to " + outputStream + " : " + ex.getMessage(), ex);
+            throw new IOException("Cannot Transcode from " + inputStream + " to " + outputStream + " : " + ex.getMessage(), ex);
         }
     }
 }
