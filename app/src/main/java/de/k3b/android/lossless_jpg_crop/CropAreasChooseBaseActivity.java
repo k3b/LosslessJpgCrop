@@ -13,7 +13,6 @@ import androidx.core.content.FileProvider;
 import android.provider.DocumentsContract;
 import android.util.Log;
 import android.view.Menu;
-import android.view.MenuItem;
 import android.widget.Toast;
 
 import net.realify.lib.androidimagecropper.CropImageView;
@@ -27,6 +26,8 @@ import java.io.OutputStream;
 
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+
+import de.k3b.util.TempFileUtil;
 
 /** For all different workflows CropAreaXxxxActivity:
  * * Displays the cropping gui
@@ -231,13 +232,16 @@ abstract class CropAreasChooseBaseActivity extends BaseActivity  {
     protected File getSharedDir() {
         File sharedDir = new File(this.getFilesDir(), "shared");
         sharedDir.mkdirs();
+
+        // #11: remove unused temporary crops from send/get_content after some time.
+        TempFileUtil.removeOldTempFiles(sharedDir, System.currentTimeMillis());
         return sharedDir;
     }
 
     protected String createCropFileName() {
         Uri inUri = getSourceImageUri(getIntent());
         String originalFileName = (inUri == null) ? "" : inUri.getLastPathSegment();
-        return replaceExtension(originalFileName, "_llcrop.jpg");
+        return replaceExtension(originalFileName, TempFileUtil.TEMP_FILE_SUFFIX);
     }
 
     /** replaceExtension("/path/to/image.jpg", ".xmp") becomes "/path/to/image.xmp" */

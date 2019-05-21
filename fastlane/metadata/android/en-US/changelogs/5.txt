@@ -1,0 +1,1 @@
+Bugfix: delete obsolete temp files #11
