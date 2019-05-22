@@ -25,4 +25,14 @@ the need for jpg-image-re-encoding. It also preserves embedded meta data (Exif/I
   
 ---
 
+## Requirements
+
+* Android 4.4 KitKat (API 19) or newer
+* CPU arm64-v8a, arbeabi-v7a, x86, x86-64 because of c++ cropping code
+* Permissions
+  * READ_EXTERNAL_STORAGE (to open local image)
+  * WRITE_EXTERNAL_STORAGE (to save the cropped image to)
+
+---
+
 [<img src="https://github.com/k3b/APhotoManager/wiki/fdroid.png" alt="available on F-Droid app store" height="82" width="324">](https://f-droid.org/en/packages/de.k3b.android.lossless_jpg_crop)
