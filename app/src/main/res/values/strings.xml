@@ -1,13 +1,13 @@
 <resources>
-    <string name="app_name">llCrop (Loss Less)</string>
+    <string name="app_name">llCrop (lossless)</string>
 
-    <string name="label_select_picture">Select Picture</string>
+    <string name="label_select_picture">Select picture</string>
     <string name="label_save_as">Save as</string>
-    <string name="label_send">Send/Share to</string>
+    <string name="label_send">Send/share to</string>
 
     <string name="permission_title_rationale">Permission needed</string>
-    <string name="permission_read_storage_rationale">Storage read permission is needed to pick files.</string>
-    <string name="permission_write_storage_rationale">Storage write permission is needed to save the image.</string>
+    <string name="permission_read_storage_rationale">Storage reading permission needed to pick files.</string>
+    <string name="permission_write_storage_rationale">Storage writing permission needed to save images.</string>
 
     <string name="toast_cannot_retrieve_selected_image">Quitting: No source image selected</string>
     <string name="toast_saved_as">Saved as \'%1$s\'</string>
