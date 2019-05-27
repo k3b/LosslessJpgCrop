@@ -8,6 +8,11 @@ While there are many apps capable of cropping images (some with additional featu
 llCrop ("ll" stands for lossless) can do [cropping without quality-losses](https://en.wikipedia.org/wiki/Lossy_compression#JPEG) because it crops the raw JPEG photo, without 
 the need to reencode the JPEG image. It also preserves embedded metadata (EXIF/IPTC and XMP).
 
+Note:
+
+This app if focused on "lossless jpg" image manipulation so isses that propose additional features 
+like "add text to image" or support "png" file format are out of scope.  
+
 ---
 
 ## Supported Workflows:
