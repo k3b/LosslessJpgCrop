@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">llCrop (tapsfri)</string>
+
+    <string name="label_select_picture">Velg bilde</string>
+    <string name="label_save_as">Lagre som</string>
+    <string name="label_send">Send/del</string>
+
+    <string name="permission_title_rationale">Tilgang kreves</string>
+    <string name="permission_read_storage_rationale">Lagringslesetilgang, for å velge filer.</string>
+    <string name="permission_write_storage_rationale">Lagringsskrivetilgang, for å lagre bilder.</string>
+
+    <string name="toast_cannot_retrieve_selected_image">Avslutter: Inget bilde valgt</string>
+    <string name="toast_saved_as">Lagret som \'%1$s\'</string>
+    <string name="toast_saved_error">Kan ikke lagre som \'%1$s\'.\n\n%2$s</string>
+</resources>
