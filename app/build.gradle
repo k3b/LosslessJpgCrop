@@ -14,9 +14,9 @@ android {
         // 1.0.2.190515 (3)    Bugfix: rotation; illegal filename
         // 1.1.0.190518 (4)    Implemented Workflow: GET_CONTENT/PICK/share/SEND/SENDTO to pick/re-send a cropped photo
         // 1.1.1.190522 (5)    Errorhandling/display errormessage; delete temp files; action com.android.camera.action.CROP
-
-        versionCode 5
-        versionName "1.1.1.190522"
+        // 1.1.2.190605 (6)    bugfixes send/get_content; translation-updates "en", "de","nb-rNO"
+        versionCode 6
+        versionName "1.1.2.190605"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
         // all supported locales. Note: the lib has more translations which are supressed here
