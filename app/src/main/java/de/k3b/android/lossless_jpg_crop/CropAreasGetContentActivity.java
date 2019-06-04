@@ -1,12 +1,9 @@
 package de.k3b.android.lossless_jpg_crop;
 
 import android.app.Activity;
-import android.content.ClipData;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Rect;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;

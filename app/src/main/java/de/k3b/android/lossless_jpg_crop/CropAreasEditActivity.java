@@ -7,7 +7,6 @@ import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.DocumentsContract;
-import android.provider.DocumentsProvider;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -142,8 +141,6 @@ public class CropAreasEditActivity extends CropAreasChooseBaseActivity {
         // Uri outUri = Uri.parse(_outUri + "-err");
 
         Uri outUri = _outUri;
-
-        final Intent intent = getIntent();
 
         final Uri inUri = getSourceImageUri(getIntent());
 

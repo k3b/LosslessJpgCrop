@@ -265,7 +265,7 @@ public final class CropImage {
       @NonNull PackageManager packageManager, String action, boolean includeDocuments) {
     List<Intent> intents = new ArrayList<>();
     Intent galleryIntent =
-        action == Intent.ACTION_GET_CONTENT
+            Intent.ACTION_GET_CONTENT.equals(action)
             ? new Intent(action)
             : new Intent(action, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
     galleryIntent.setType("image/*");

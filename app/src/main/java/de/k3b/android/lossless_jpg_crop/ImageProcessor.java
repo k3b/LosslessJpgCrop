@@ -8,7 +8,6 @@ import com.facebook.spectrum.Configuration;
 import com.facebook.spectrum.EncodedImageSink;
 import com.facebook.spectrum.EncodedImageSource;
 import com.facebook.spectrum.Spectrum;
-import com.facebook.spectrum.SpectrumException;
 import com.facebook.spectrum.SpectrumSoLoader;
 import com.facebook.spectrum.image.EncodedImageFormat;
 import com.facebook.spectrum.logging.SpectrumLogcatLogger;
