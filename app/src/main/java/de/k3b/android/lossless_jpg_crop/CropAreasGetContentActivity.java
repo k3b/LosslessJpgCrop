@@ -92,6 +92,7 @@ public class CropAreasGetContentActivity extends CropAreasChooseBaseActivity {
         if (outUri != null) {
             Intent result = new Intent();
             result.setDataAndType(outUri, IMAGE_JPEG_MIME);
+            result.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
             setResult(Activity.RESULT_OK, result);
             finish();
             return true;
