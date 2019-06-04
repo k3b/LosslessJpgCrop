@@ -14,7 +14,7 @@ import android.view.MenuItem;
 /**
  * Handles ACTION_GET_CONTENT and ACTION_PICK to pick a cropped image
  *
- * #3: GET_CONTENT => llCrop => sourcePhoto.jpg=GET_CONTENT(mime=image/jpeg) => return crop(sourcePhoto.jpg)
+ * #3: GET_CONTENT => LLCrop => sourcePhoto.jpg=GET_CONTENT(mime=image/jpeg) => return crop(sourcePhoto.jpg)
  */
 public class CropAreasGetContentActivity extends CropAreasChooseBaseActivity {
     private static final String KEY_SOURCE_IMAGE_URI = "mSourceImageUri";

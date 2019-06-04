@@ -17,7 +17,7 @@
 
         <provider
             android:name="androidx.core.content.FileProvider"
-            android:authorities="de.k3b.llCrop"
+            android:authorities="de.k3b.LLCrop"
             android:exported="false"
             android:grantUriPermissions="true">
             <meta-data

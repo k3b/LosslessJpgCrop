@@ -1,11 +1,11 @@
-llCrop allows either [removal of unwanted outer areas from a JPEG-photo](https://en.wikipedia.org/wiki/Cropping_(image)) 
+LLCrop allows either [removal of unwanted outer areas from a JPEG-photo](https://en.wikipedia.org/wiki/Cropping_(image)) 
 or creation of zoom-ins.
 
 Load a JPEG photo, make a rectangular selection, to be saved as a new photo-file.
 
 While there are many apps capable of cropping images (some with additional features) these apps cause [quality-losses caused by reencoding of JPEG](https://en.wikipedia.org/wiki/Lossy_compression).
 
-llCrop ("ll" stands for lossless) can do [cropping without quality-losses](https://en.wikipedia.org/wiki/Lossy_compression#JPEG) because it crops the raw JPEG photo, without 
+LLCrop ("ll" stands for lossless) can do [cropping without quality-losses](https://en.wikipedia.org/wiki/Lossy_compression#JPEG) because it crops the raw JPEG photo, without 
 the need to reencode the JPEG image. It also preserves embedded metadata (EXIF/IPTC and XMP).
 
 Note:

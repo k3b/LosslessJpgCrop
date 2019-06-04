@@ -1,4 +1,4 @@
-llCrop ermöglicht es unerwünschte Randbereiche 
+LLCrop ermöglicht es unerwünschte Randbereiche
 aus einem jpg-photo zu entfernen oder digitale 
 Ausschnitt-Vergrößerungen zu erstellen.
 
@@ -7,12 +7,12 @@ Bereich auswählen und den Ausschnitt in eine neue
 PhotoDatei speichern.
 
 Im Gegensatz zu den meisten anderen Bildbearbeitungen 
-mit Bildschnittfunktion vermeidet llCrop 
+mit Bildschnittfunktion vermeidet LLCrop
 Qualitätsverluste durch erneutes jpg-kodieren. 
 Es arbeited auf den jpg-rohdaten und bewahrt eingebette
 Metadaten (Exif/Iptc/Xmp). 
 
-Das "ll" in "llCrop" steht für das englische "loss-less" 
+Das "LL" in "LLCrop" steht für das englische "loss-less"
 was verlustfrei bedeutet.
 
 

@@ -33,7 +33,7 @@ import de.k3b.util.TempFileUtil;
  * * Displays the cropping gui
  * * Contains Protected helpers for common functionalities */
 abstract class CropAreasChooseBaseActivity extends BaseActivity  {
-    protected static final String TAG = "llCrop";
+    protected static final String TAG = "LLCrop";
 
     private static int lastInstanceNo4Debug = 0;
     private int instanceNo4Debug = 0;
@@ -274,7 +274,7 @@ abstract class CropAreasChooseBaseActivity extends BaseActivity  {
                 outStream = new FileOutputStream(outFile, false);
                 crop(inStream, outStream, rect);
 
-                outUri = FileProvider.getUriForFile(this, "de.k3b.llCrop", outFile);
+                outUri = FileProvider.getUriForFile(this, "de.k3b.LLCrop", outFile);
 
             } catch (Exception e) {
                 // #14: delete affected file as it is useless

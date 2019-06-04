@@ -1,12 +1,12 @@
-llCrop allows you to either remove unwanted outer areas from 
+LLCrop allows you to either remove unwanted outer areas from
 a jpg-photo or to create zoom-ins.
 
 Just load a jpeg photo, select a rectangle and save the 
 rectangle as a new photo-file.
 
-Unlike most other photo-cropping software llCrop avoids 
+Unlike most other photo-cropping software LLCrop avoids
 quality-losses caused by jpg-re-encoding. 
 It is processing raw jpg-photo-data and preserves embedded 
 meta data (Exif/Iptc and xmp). 
 
-"ll" in "llCrop" means "loss-less"
+"LL" in "LLCrop" means "loss-less"
