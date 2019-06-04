@@ -14,6 +14,16 @@ import static org.junit.Assert.*;
 public class TempFileUnitTest {
     private static final String FILE_NAME = "hello" + TempFileUtil.TEMP_FILE_SUFFIX;
 
+    //
+    @Test
+    public void shouldGetPath() {
+        final String expected = "190020_llcrop_llcrop.jpg";
+        String in = "primary:DCIM/test/" + expected;
+        assertEquals(expected, TempFileUtil.getLastPath(in));
+        assertEquals(expected, TempFileUtil.getLastPath(expected));
+        assertEquals(null, TempFileUtil.getLastPath(null));
+    }
+
     @Test
     public void shouldDeleteOldTempFile() {
         long fileDate = getTime(13, 1);

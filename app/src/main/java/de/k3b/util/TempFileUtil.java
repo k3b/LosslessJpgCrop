@@ -34,4 +34,14 @@ public class TempFileUtil {
                 && fileName.endsWith(TEMP_FILE_SUFFIX);
     }
 
+    public static String getLastPath(String originalFileName) {
+        if (originalFileName != null) {
+            int splitPos =  originalFileName.lastIndexOf(File.separatorChar);
+            if (splitPos == -1) splitPos =  originalFileName.lastIndexOf('/');
+            if (splitPos >= 0) originalFileName = originalFileName.substring(splitPos + 1);
+        }
+        return originalFileName;
+    }
+
+
 }

@@ -6,7 +6,7 @@ android {
         applicationId "de.k3b.android.lossless_jpg_crop"
 
         // SAF ACTION_CREATE_DOCUMENT requires api-19 and later
-        minSdkVersion 19
+        minSdkVersion 19		// Android 4.4 KitKat (API 19);  Android 5.0 Lollipop (API 21); Android 6.0 Marshmallow (API 23); Android 7.0 Nougat (API 24)
         targetSdkVersion 28
 
         // 1.0.0.190425 (1)    initial version
@@ -14,7 +14,7 @@ android {
         // 1.0.2.190515 (3)    Bugfix: rotation; illegal filename
         // 1.1.0.190518 (4)    Implemented Workflow: GET_CONTENT/PICK/share/SEND/SENDTO to pick/re-send a cropped photo
         // 1.1.1.190522 (5)    Errorhandling/display errormessage; delete temp files; action com.android.camera.action.CROP
-        
+
         versionCode 5
         versionName "1.1.1.190522"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"

@@ -1,0 +1,1 @@
+#2 #3: bugfix created illegal local file name for send/get_content

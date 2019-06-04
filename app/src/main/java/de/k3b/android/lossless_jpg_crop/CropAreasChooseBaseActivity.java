@@ -241,6 +241,7 @@ abstract class CropAreasChooseBaseActivity extends BaseActivity  {
     protected String createCropFileName() {
         Uri inUri = getSourceImageUri(getIntent());
         String originalFileName = (inUri == null) ? "" : inUri.getLastPathSegment();
+        originalFileName = TempFileUtil.getLastPath(originalFileName);
         return replaceExtension(originalFileName, TempFileUtil.TEMP_FILE_SUFFIX);
     }
 
