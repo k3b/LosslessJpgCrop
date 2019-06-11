@@ -2,7 +2,16 @@
 <!--
 Italian translation by unbranched.
 
-Copyright (C) 2019 k3b
+for italian translations these files are affected:
+
+* .../LosslessJpgCrop/app/src/main/res/values-it/strings.xml
+* .../LosslessJpgCrop/cropper/src/main/res/values-it/strings.xml
+* .../LosslessJpgCrop/fastlane/metadata/android/it-IT/full_description.txt
+* .../LosslessJpgCrop/fastlane/metadata/android/it-IT/short_description.txt
+* .../LosslessJpgCrop/fastlane/metadata/android/it-IT/title.txt
+* .../LosslessJpgCrop/app/build.gradle: android.defaultConfig.resConfigs "de","nb-rNO","it" // make shure "it" is included
+
+Copyright (C) 2019 unbranched
 
 This file is part of de.k3b.android.lossless_jpg_crop (https://github.com/k3b/LosslessJpgCrop/)
 
