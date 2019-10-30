@@ -1,4 +1,4 @@
-While there are many apps capable of cropping images (often with additional features) these generally cause quality loss because they [re-encode to JPEG again](https://en.wikipedia.org/wiki/Lossy_compression) when saving the output file.
+While there are many apps capable of cropping images (often with additional features), they generally cause quality loss because they [re-encode to JPEG again](https://en.wikipedia.org/wiki/Lossy_compression) when saving the output file.
 
 LLCrop (the "LL" stands for lossless) can [crop JPEG images without quality loss](https://en.wikipedia.org/wiki/Lossy_compression#JPEG) because it crops the raw JPEG image without re-encoding the file. It also preserves embedded metadata (EXIF/IPTC and XMP).
 
