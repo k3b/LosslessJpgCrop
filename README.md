@@ -1,21 +1,18 @@
-LLCrop allows either [removal of unwanted outer areas from a JPEG image](https://en.wikipedia.org/wiki/Cropping_(image)) 
-or creation of zoom-ins.
+While there are many apps capable of cropping images (often with additional features) these generally cause quality loss because they [re-encode to JPEG again](https://en.wikipedia.org/wiki/Lossy_compression) when saving the output file.
 
-Load a JPEG image, adjust the rectangular selection and save it as a new image file.
+LLCrop (the "LL" stands for lossless) can [crop JPEG images without quality loss](https://en.wikipedia.org/wiki/Lossy_compression#JPEG) because it crops the raw JPEG image without re-encoding the file. It also preserves embedded metadata (EXIF/IPTC and XMP).
 
-While there are many apps capable of cropping images (some with additional features) these apps cause quality loss because they [reencode when saving the output file](https://en.wikipedia.org/wiki/Lossy_compression).
+Simply load a JPEG image from the in-app image browser, adjust the rectangular selection, and save it as a new image file.
 
-LLCrop ("LL" stands for lossless) can [crop JPEG images without quality loss](https://en.wikipedia.org/wiki/Lossy_compression#JPEG) because it crops the raw JPEG photo, without the need to reencode the JPEG image. It also preserves embedded metadata (EXIF/IPTC and XMP).
-
-Note: This app is focused on "lossless jpg" image manipulation, so issues that propose additional features (e.g. support for other file formats or adding text to images) are out of scope.  
+Note: This app is focused on lossless JPEG image manipulation, so issues that propose additional features (e.g. support for other file formats or adding text to images) are out of scope.
 
 ---
 
 ## Supported Workflows:
 
-* [#1](https://github.com/k3b/LosslessJpgCrop/issues/1) From Android **App-Launcher**:
+* [#1](https://github.com/k3b/LosslessJpgCrop/issues/1) From Android **app launcher**:
     * Pick an image and crop it to a new public file
-* [#1](https://github.com/k3b/LosslessJpgCrop/issues/1) From any **File manager** or **Gallery app** that supports [intent-action-EDIT](https://developer.android.com/reference/android/content/Intent#ACTION_EDIT) for MIME *image/jpeg*:
+* [#1](https://github.com/k3b/LosslessJpgCrop/issues/1) From any **file manager** or **gallery app** that supports [intent-action-EDIT](https://developer.android.com/reference/android/content/Intent#ACTION_EDIT) for MIME *image/jpeg*:
 	* Crop current selected image to a new public file
 * [#2](https://github.com/k3b/LosslessJpgCrop/issues/2): From any app that supports [intent-action-SEND](https://developer.android.com/reference/android/content/Intent#ACTION_SEND) or [intent-action-SEND-TO](https://developer.android.com/reference/android/content/Intent#ACTION_SENDTO) for MIME *image/jpeg*
 	* Send/SendTo/Share a cropped version of the currently selected image 
