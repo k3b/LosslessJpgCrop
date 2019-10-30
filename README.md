@@ -1,17 +1,13 @@
-LLCrop allows either [removal of unwanted outer areas from a JPEG-photo](https://en.wikipedia.org/wiki/Cropping_(image)) 
+LLCrop allows either [removal of unwanted outer areas from a JPEG image](https://en.wikipedia.org/wiki/Cropping_(image)) 
 or creation of zoom-ins.
 
-Load a JPEG photo, make a rectangular selection, to be saved as a new photo-file.
+Load a JPEG image, adjust the rectangular selection and save it as a new image file.
 
-While there are many apps capable of cropping images (some with additional features) these apps cause [quality-losses caused by reencoding of JPEG](https://en.wikipedia.org/wiki/Lossy_compression).
+While there are many apps capable of cropping images (some with additional features) these apps cause quality loss because they [reencode when saving the output file](https://en.wikipedia.org/wiki/Lossy_compression).
 
-LLCrop ("ll" stands for lossless) can do [cropping without quality-losses](https://en.wikipedia.org/wiki/Lossy_compression#JPEG) because it crops the raw JPEG photo, without 
-the need to reencode the JPEG image. It also preserves embedded metadata (EXIF/IPTC and XMP).
+LLCrop ("LL" stands for lossless) can [crop JPEG images without quality loss](https://en.wikipedia.org/wiki/Lossy_compression#JPEG) because it crops the raw JPEG photo, without the need to reencode the JPEG image. It also preserves embedded metadata (EXIF/IPTC and XMP).
 
-Note:
-
-This app if focused on "lossless jpg" image manipulation so isses that propose additional features 
-like "add text to image" or support "png" file format are out of scope.  
+Note: This app is focused on "lossless jpg" image manipulation, so issues that propose additional features (e.g. support for other file formats or adding text to images) are out of scope.  
 
 ---
 
