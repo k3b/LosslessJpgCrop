@@ -10,7 +10,7 @@ import android.view.Menu;
  *
  * #2: SEND/SENDTO(uri=sourcePhoto.jpg) => crop => tempfile.jpg => SEND/SENDTO(uri=tempfile.jpg)
  */
-public class CropAreasSendActivity extends CropAreaChooserBaseActivityEx {
+public class CropAreasSendActivity extends CropAreasChooseBaseActivity {
     public CropAreasSendActivity() {
         super(R.id.menu_send);
     }

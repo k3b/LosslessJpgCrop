@@ -11,7 +11,7 @@ import android.view.Menu;
  *
  * #3: GET_CONTENT => LLCrop => sourcePhoto.jpg=GET_CONTENT(mime=image/jpeg) => return crop(sourcePhoto.jpg)
  */
-public class CropAreasGetContentActivity extends CropAreaChooserBaseActivityEx {
+public class CropAreasGetContentActivity extends CropAreasChooseBaseActivity {
     public CropAreasGetContentActivity() {
         super(R.id.menu_get_content);
     }

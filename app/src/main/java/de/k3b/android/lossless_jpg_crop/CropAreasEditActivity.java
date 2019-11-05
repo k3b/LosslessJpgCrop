@@ -12,7 +12,7 @@ import android.view.Menu;
  * Handles ACTION_EDIT(uri=DATA) and ACTION_MAIN:
  */
 
-public class CropAreasEditActivity extends CropAreaChooserBaseActivityEx {
+public class CropAreasEditActivity extends CropAreasChooseBaseActivity {
     public CropAreasEditActivity() {
         super(R.id.menu_save);
     }
