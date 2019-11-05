@@ -1,2 +1,4 @@
+// startParameter.offline = true
+
 // include ':app', ':ucrop'
 include ':app', ':cropper'

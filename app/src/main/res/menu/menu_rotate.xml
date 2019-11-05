@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools">
+    <item android:id="@+id/menu_rotate"
+        android:showAsAction="ifRoom"
+        android:icon="@android:drawable/ic_menu_rotate"
+        android:title="@string/label_rotate"
+        android:orderInCategory="50"
+        tools:ignore="AppCompatResource" >
+        <menu>
+            <item android:id="@+id/menu_rotate_0"
+                android:showAsAction="never"
+                android:title="0"
+                android:checkable="true"
+                tools:ignore="AppCompatResource" />
+            <item android:id="@+id/menu_rotate_90"
+                android:showAsAction="never"
+                android:title="90"
+                android:checkable="true"
+                tools:ignore="AppCompatResource" />
+            <item android:id="@+id/menu_rotate_180"
+                android:showAsAction="never"
+                android:title="180"
+                android:checkable="true"
+                tools:ignore="AppCompatResource" />
+            <item android:id="@+id/menu_rotate_270"
+                android:showAsAction="never"
+                android:title="270"
+                android:checkable="true"
+                tools:ignore="AppCompatResource" />
+        </menu>
+    </item>
+</menu>

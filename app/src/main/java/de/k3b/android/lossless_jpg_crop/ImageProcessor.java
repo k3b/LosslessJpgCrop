@@ -34,24 +34,24 @@ public class ImageProcessor {
         // DefaultPlugins.get()); // JPEG, PNG and WebP plugins
     }
 
-    public void crop(InputStream inputStream, OutputStream outputStream, Rect rect, int degrees)  throws IOException {
-        crop(inputStream, outputStream, rect.left, rect.top, rect.right, rect.bottom, degrees);
+    public void crop(InputStream inputStream, OutputStream outputStream, Rect rect, int relativeRotationInDegrees)  throws IOException {
+        crop(inputStream, outputStream, rect.left, rect.top, rect.right, rect.bottom, relativeRotationInDegrees);
     }
 
-    public void crop(InputStream inputStream, OutputStream outputStream, int left, int top, int right, int bottom, int degrees) throws IOException {
+    public void crop(InputStream inputStream, OutputStream outputStream, int left, int top, int right, int bottom, int relativeRotationInDegrees) throws IOException {
         final EncodeRequirement encoding =
                 new EncodeRequirement(EncodedImageFormat.JPEG, 80, EncodeRequirement.Mode.LOSSLESS);
         try {
+            final TranscodeOptions.Builder optionsBuilder = TranscodeOptions
+                    .Builder(encoding)
+                    .cropAbsoluteToOrigin(left, top, right, bottom, false);
+            if (relativeRotationInDegrees != 0) {
+                optionsBuilder.rotate(relativeRotationInDegrees);
+            }
             mSpectrum.transcode(
                     EncodedImageSource.from(inputStream),
                     EncodedImageSink.from(outputStream),
-                    TranscodeOptions
-                            .Builder(encoding)
-                            .cropAbsoluteToOrigin(left, top, right, bottom, false)
-
-                            // forceUpOrientation=true
-                            // .rotate(degrees, false, false, true)
-                            .build(),
+                    optionsBuilder.build(),
                     "my_callsite_identifier");
         } catch (Exception ex) {
             throw new IOException("Cannot Transcode from " + inputStream + " to " + outputStream + " : " + ex.getMessage(), ex);

@@ -1,4 +1,4 @@
 changed title from "llCrop" to "LLCrop"
-bugfix created illegal local file name for send/get_content
+bugfix fixed illegal local file name for send/get_content
 bugfix added missing permission for get_content
 Translation updates "en", "de","nb-rNO"
