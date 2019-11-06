@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Italian translation by unbranched.
+
+for italian translations these files are affected:
+
+* .../LosslessJpgCrop/app/src/main/res/values-it/strings.xml
+* .../LosslessJpgCrop/cropper/src/main/res/values-it/strings.xml
+* .../LosslessJpgCrop/fastlane/metadata/android/it-IT/full_description.txt
+* .../LosslessJpgCrop/fastlane/metadata/android/it-IT/short_description.txt
+* .../LosslessJpgCrop/fastlane/metadata/android/it-IT/title.txt
+* .../LosslessJpgCrop/app/build.gradle: android.defaultConfig.resConfigs "de","nb-rNO","it" // make shure "it" is included
+
+Copyright (C) 2019 unbranched
+
+This file is part of de.k3b.android.lossless_jpg_crop (https://github.com/k3b/LosslessJpgCrop/)
+
+This program is free software: you can redistribute it and/or modify it
+under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+
+You should have received a copy of the GNU General Public License along with
+this program. If not, see <http://www.gnu.org/licenses/>
+-->
+<resources>
+    <string name="app_name">LLCrop (lossless)</string>
+
+    <string name="label_select_picture">Seleziona immagine</string>
+    <string name="label_save_as">Salva con nome</string>
+    <string name="label_send">Invia/condividi</string>
+
+    <string name="permission_title_rationale">Autorizzazione necessaria</string>
+    <string name="permission_read_storage_rationale">Autorizzazione di lettura archivio necessaria per scegliere i file.</string>
+    <string name="permission_write_storage_rationale">Autorizzazione di scrittura archivio necessaria per scrivere le immagini.</string>
+
+    <string name="toast_cannot_retrieve_selected_image">Uscita: nessuna immagine selezionata</string>
+    <string name="toast_saved_as">Salvata come \'%1$s\'</string>
+    <string name="toast_saved_error">Impossibile salvare come \'%1$s\'.\n\n%2$s</string>
+</resources>

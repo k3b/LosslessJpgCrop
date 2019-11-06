@@ -1,6 +1,15 @@
 <!--
 Norwegian Bokmål translation by Allan Nordhøy.
 
+for Norwegian Bokmål translations these files are affected:
+
+* .../LosslessJpgCrop/app/src/main/res/values-nb-rNO/strings.xml
+* .../LosslessJpgCrop/cropper/src/main/res/values-nb-rNO/strings.xml
+* .../LosslessJpgCrop/fastlane/metadata/android/nb-NO/full_description.txt
+* .../LosslessJpgCrop/fastlane/metadata/android/nb-NO/short_description.txt
+* .../LosslessJpgCrop/fastlane/metadata/android/nb-NO/title.txt
+* .../LosslessJpgCrop/app/build.gradle: android.defaultConfig.resConfigs "de","nb-rNO","it" // make shure "nb-rNO" is included
+
 Copyright (C) 2019 Allan Nordhøy
 
 This file is part of de.k3b.android.lossless_jpg_crop (https://github.com/k3b/LosslessJpgCrop/)

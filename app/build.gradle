@@ -22,7 +22,7 @@ android {
 
         // all supported locales. Note: the lib has more translations which are supressed here
         // resConfigs "ar","de","es","fr","hi","in","it","ja","nl","pl","ro","ru","tr","uk","zz","pt-rBR","zh-rCN","zh-rTW"
-        resConfigs "de","nb-rNO"
+        resConfigs "de","nb-rNO","it"
     }
     buildTypes {
         debug {
