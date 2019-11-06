@@ -20,7 +20,7 @@ public class CropAreasSendActivity extends CropAreasChooseBaseActivity {
         super.onCreate(savedInstanceState);
         Uri uri = getSourceImageUri(getIntent());
 
-        SetImageUriAndLastCropArea(uri, savedInstanceState);
+        send.onGetSendImage(uri, savedInstanceState);
     }
 
     @Override

@@ -206,6 +206,10 @@ abstract class CropAreasChooseBaseActivity extends BaseActivity  {
     protected Edit edit = new Edit();
 
     protected class Send {
+        protected void onGetSendImage(Uri uri, Bundle savedInstanceState) {
+            SetImageUriAndLastCropArea(uri, savedInstanceState);
+        }
+
         protected boolean sendPrivateCroppedImage() {
             Uri outUri = cropToSharedUri();
 
