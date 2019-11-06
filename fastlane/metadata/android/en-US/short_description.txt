@@ -1,1 +1,1 @@
-loss less cropping: Remove unwanted parts of jpg photo without quality loss.
+Loss Less Cropping and Rotation: Remove unwanted parts of jpg photo without quality loss.

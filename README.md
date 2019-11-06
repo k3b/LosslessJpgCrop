@@ -1,10 +1,16 @@
-While there are many apps capable of cropping images (often with additional features), they generally cause quality loss because they [re-encode to JPEG again](https://en.wikipedia.org/wiki/Lossy_compression) when saving the output file.
+Loss Less Cropping and Image Rotation: Remove unwanted parts of jpg photo without quality loss.
 
-LLCrop (the "LL" stands for lossless) can [crop JPEG images without quality loss](https://en.wikipedia.org/wiki/Lossy_compression#JPEG) because it crops the raw JPEG image without re-encoding the file. It also preserves embedded metadata (EXIF/IPTC and XMP).
+While there are many apps capable of cropping images (often with additional features), 
+they generally cause quality loss because they 
+[re-encode to JPEG again](https://en.wikipedia.org/wiki/Lossy_compression) when saving the output file.
 
-Simply load a JPEG image from the in-app image browser, adjust the rectangular selection, and save it as a new image file.
+LLCrop (the "LL" stands for lossless) can [crop JPEG images without quality loss](https://en.wikipedia.org/wiki/Lossy_compression#JPEG) 
+because it crops the raw JPEG image without re-encoding the file. It also preserves embedded metadata (EXIF/IPTC and XMP).
 
-Note: This app is focused on lossless JPEG image manipulation, so issues that propose additional features (e.g. support for other file formats or adding text to images) are out of scope.
+Simply load a JPEG image from the in-app image browser, adjust the rectangular selection, rotate it if necessary and save it as a new image file.
+
+Note: This app is focused on lossless JPEG image manipulation, so issues that propose additional 
+features (e.g. support for other file formats or adding text to images) are out of scope.
 
 ---
 
@@ -18,7 +24,7 @@ Note: This app is focused on lossless JPEG image manipulation, so issues that pr
 	* Send/SendTo/Share a cropped version of the currently selected image 
 * [#3](https://github.com/k3b/LosslessJpgCrop/issues/3)/[#8](https://github.com/k3b/LosslessJpgCrop/issues/8): From any app that supports [intent-action-GET-CONTENT](https://developer.android.com/reference/android/content/Intent#ACTION_GET_CONTENT) or intent-action-PICK for MIME *image/jpeg*
 	* Open/Pick the cropping of an uncropped image
-  
+* [#17](https://github.com/k3b/LosslessJpgCrop/issues/17) : added support for image rotation
 ---
 
 ## Requirements

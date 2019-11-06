@@ -1,12 +1,15 @@
 LLCrop allows you to either remove unwanted outer areas from
 a jpg-photo or to create zoom-ins.
 
-Just load a jpeg photo, select a rectangle and save the 
-rectangle as a new photo-file.
+Simply load a JPEG image from the in-app image browser,
+adjust the rectangular selection, rotate it if necessary
+and save it as a new image file.
 
-Unlike most other photo-cropping software LLCrop avoids
-quality-losses caused by jpg-re-encoding. 
-It is processing raw jpg-photo-data and preserves embedded 
-meta data (Exif/Iptc and xmp). 
+While there are many apps capable of cropping images (often with
+additional features), they generally cause quality loss because
+they re-encode to JPEG again when saving the output file.
 
-"LL" in "LLCrop" means "loss-less"
+LLCrop (the "LL" stands for lossless) can
+crop JPEG images without quality loss
+because it crops the raw JPEG image without re-encoding the file.
+It also preserves embedded metadata (EXIF/IPTC and XMP).

@@ -3,7 +3,7 @@ aus einem jpg-photo zu entfernen oder digitale
 Ausschnitt-Vergrößerungen zu erstellen.
 
 Einfach ein Jpeg-Photo laden, einen rechteckigen 
-Bereich auswählen und den Ausschnitt in eine neue 
+Bereich auswählen, ggf drehen und den Ausschnitt in eine neue
 PhotoDatei speichern.
 
 Im Gegensatz zu den meisten anderen Bildbearbeitungen 
