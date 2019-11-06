@@ -1,1 +1,2 @@
 Added jpg Image Rotation
+Added italian translations
