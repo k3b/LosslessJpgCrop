@@ -10,7 +10,7 @@ because it crops the raw JPEG image without re-encoding the file. It also preser
 Simply load a JPEG image from the in-app image browser, adjust the rectangular selection, rotate it if necessary and save it as a new image file.
 
 Note: This app is focused on lossless JPEG image manipulation, so issues that propose additional 
-features (e.g. support for other file formats or adding text to images) are out of scope.
+features (e.g. support for other file formats, add resize-support or adding text to images) are out of scope.
 
 ---
 
