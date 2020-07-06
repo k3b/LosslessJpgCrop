@@ -45,4 +45,5 @@ this program. If not, see <http://www.gnu.org/licenses/>
     <string name="toast_saved_as">Saved as \'%1$s\'</string>
     <string name="toast_saved_error">Cannot save as \'%1$s\'.\n\n%2$s</string>
     <string name="label_rotate">Rotate ...</string>
+    <string name="permission_error">Missing permisions</string>
 </resources>

@@ -12,15 +12,15 @@ import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.FileProvider;
-import androidx.exifinterface.media.ExifInterface;
-
 import android.provider.DocumentsContract;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
+
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.FileProvider;
+import androidx.exifinterface.media.ExifInterface;
 
 import net.realify.lib.androidimagecropper.CropImageView;
 
@@ -30,7 +30,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
@@ -38,10 +37,12 @@ import java.util.Map;
 
 import de.k3b.util.TempFileUtil;
 
-/** For all different workflows CropAreaXxxxActivity:
+/**
+ * For all different workflows CropAreaXxxxActivity:
  * * Displays the cropping gui
- * * Contains Protected helpers for common functionalities */
-abstract class CropAreasChooseBaseActivity extends BaseActivity  {
+ * * Contains Protected helpers for common functionalities
+ */
+abstract class CropAreasChooseBaseActivity extends BaseActivity {
     protected static final String TAG = "LLCrop";
     protected static final boolean LOAD_ASYNC = false;
 
@@ -49,11 +50,11 @@ abstract class CropAreasChooseBaseActivity extends BaseActivity  {
     private int instanceNo4Debug = 0;
 
     private final int idMenuMainMethod;
-    private final Map<Integer,Integer> menu2Rotation;
+    private final Map<Integer, Integer> menu2Rotation;
 
     protected CropAreasChooseBaseActivity(int idMenuMainMethod) {
         this.idMenuMainMethod = idMenuMainMethod;
-        menu2Rotation = new HashMap<Integer,Integer>();
+        menu2Rotation = new HashMap<>();
         menu2Rotation.put(R.id.menu_rotate_0, 0);
         menu2Rotation.put(R.id.menu_rotate_90, 90);
         menu2Rotation.put(R.id.menu_rotate_180, 180);
@@ -145,7 +146,6 @@ abstract class CropAreasChooseBaseActivity extends BaseActivity  {
             Log.d(TAG, getInstanceNo4Debug() +  getString(R.string.toast_cannot_retrieve_selected_image));
             Toast.makeText(getBaseContext(), R.string.toast_cannot_retrieve_selected_image, Toast.LENGTH_SHORT).show();
             finishIfMainMethod(R.id.menu_save);
-            return;
         }
         protected void onSaveEditPictureAsOutputUriPickerResult(Uri _outUri) {
 
@@ -314,7 +314,9 @@ abstract class CropAreasChooseBaseActivity extends BaseActivity  {
                 Bitmap bitmap = BitmapFactory.decodeStream(stream);
                 ExifInterface exif = getExif(this, uri);
                 uCropView.setImageBitmap(bitmap, exif);
-                setBaseRotation(exif.getRotationDegrees());
+                if (exif != null) {
+                    setBaseRotation(exif.getRotationDegrees());
+                }
             }
             setCropRect(crop);
             
@@ -354,8 +356,7 @@ abstract class CropAreasChooseBaseActivity extends BaseActivity  {
     protected Uri getSourceImageUri(Intent intent) {
         if (intent == null) return null;
 
-        Uri uri = intent.getData();
-        return uri;
+        return intent.getData();
     }
 
     private void setCropRect(final Rect crop) {
@@ -467,6 +468,13 @@ abstract class CropAreasChooseBaseActivity extends BaseActivity  {
                     edit.saveAsPublicCroppedImage();
                     return;
             }
+        } else {
+            Log.i(TAG, this.getClass().getSimpleName()
+                    + ": " + getText(R.string.permission_error));
+            Toast.makeText(this, R.string.permission_error, Toast.LENGTH_LONG).show();
+            setResult(Activity.RESULT_CANCELED, null);
+            finish();
+
         }
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
@@ -600,7 +608,9 @@ abstract class CropAreasChooseBaseActivity extends BaseActivity  {
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         for(Integer key : menu2Rotation.keySet()) {
-            menu.findItem(key.intValue()).setChecked(getRotation() == menu2Rotation.get(key).intValue());
+            if (key != null) {
+                menu.findItem(key).setChecked(getRotation() == menu2Rotation.get(key));
+            }
         }
         return super.onPrepareOptionsMenu(menu);
     }
@@ -610,7 +620,7 @@ abstract class CropAreasChooseBaseActivity extends BaseActivity  {
     public boolean onOptionsItemSelected(MenuItem item) {
         Integer rotation = menu2Rotation.get(item.getItemId());
         if (rotation != null) {
-            this.setRotation(rotation.intValue());
+            this.setRotation(rotation);
             uCropView.setRotatedDegrees(this.getRotation());
             return true;
         }

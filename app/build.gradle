@@ -16,8 +16,9 @@ android {
         // 1.1.1.190522 (5)    Errorhandling/display errormessage; delete temp files; action com.android.camera.action.CROP
         // 1.1.2.190605 (6)    bugfixes send/get_content; translation-updates "en", "de","nb-rNO"
         // 1.2.0.191107 (7)    Added jpg Image Rotation
-        versionCode 7
-        versionName "1.2.0.191107"
+        // 1.2.1.200708 (8)    fix #4: Cropping result image without exif-thumbnail
+        versionCode 8
+        versionName "1.2.1.200708"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
         // all supported locales. Note: the lib has more translations which are supressed here
@@ -37,23 +38,30 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+    lintOptions {
+        // http://stackoverflow.com/questions/31350350/generating-signed-apk-error7-missingtranslation-in-build-generated-res-gen
+        // MissingTranslation : not all crowdwin translations are complete so ignore them
+        disable 'MissingTranslation'
+
+        abortOnError false
+    }
 }
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-    implementation 'androidx.annotation:annotation:1.0.0'
+    implementation 'androidx.annotation:annotation:1.1.0'
 
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
     testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'androidx.test:runner:1.1.0'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.0'
+    androidTestImplementation 'androidx.test:runner:1.2.0'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
 
 
     // implements lossless croppig
     //  implementation 'com.facebook.spectrum:spectrum-default:1.0.0'
-    implementation 'com.facebook.spectrum:spectrum-core:1.0.0'
-    implementation 'com.facebook.spectrum:spectrum-jpeg:1.0.0'
+    implementation 'com.facebook.spectrum:spectrum-core:1.2.0'
+    implementation 'com.facebook.spectrum:spectrum-jpeg:1.2.0'
     // the cropping gui
     // implementation 'com.edmodo:cropper:1.0.1'
     // implementation "com.naver.android.helloyako:imagecropview:1.2.2"
