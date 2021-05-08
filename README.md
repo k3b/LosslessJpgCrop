@@ -38,3 +38,12 @@ features (e.g. support for other file formats, add resize-support or adding text
 ---
 
 [<img src="https://github.com/k3b/APhotoManager/wiki/fdroid.png" alt="available on F-Droid app store" height="82" width="324">](https://f-droid.org/en/packages/de.k3b.android.lossless_jpg_crop)
+
+-----
+
+## Donations: 
+
+If you like this app please consider to donating to https://f-droid.org/donate .
+
+Since android-developping is a hobby (and an education tool) i donot want any 
+money for my apps so donation should go to projects i benefit from.
