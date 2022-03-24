@@ -38,3 +38,5 @@ features (e.g. support for other file formats, add resize-support or adding text
 ---
 
 [<img src="https://github.com/k3b/APhotoManager/wiki/fdroid.png" alt="available on F-Droid app store" height="82" width="324">](https://f-droid.org/en/packages/de.k3b.android.lossless_jpg_crop)
+![](https://github.com/k3b/LosslessJpgCrop/raw/master/app/src/debug/res/drawable/QR_CODE_URL_llcrop@fdroid.png)
+
