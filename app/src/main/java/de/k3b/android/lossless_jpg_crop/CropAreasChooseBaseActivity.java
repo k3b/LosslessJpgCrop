@@ -118,11 +118,11 @@ abstract class CropAreasChooseBaseActivity extends BaseActivity {
                     .setType(IMAGE_JPEG_MIME)
                     .addCategory(Intent.CATEGORY_OPENABLE)
                     .putExtra(Intent.EXTRA_TITLE, proposedFileName)
-                    .putExtra(DocumentsContract.EXTRA_PROMPT, getString(R.string.label_save_as))
                     .setFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION
-                            | Intent.FLAG_GRANT_WRITE_URI_PERMISSION
-                            | Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION)
-                    ;
+                            | Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION);
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+                intent.putExtra(DocumentsContract.EXTRA_PROMPT, getString(R.string.label_save_as));
+            }
 
             Log.d(TAG, getInstanceNo4Debug() + "openPublicOutputUriPicker '" + proposedFileName + "'");
 
@@ -421,9 +421,11 @@ abstract class CropAreasChooseBaseActivity extends BaseActivity {
             Intent intent = new Intent(Intent.ACTION_GET_CONTENT)
                     .setType(IMAGE_JPEG_MIME)
                     .putExtra(Intent.EXTRA_TITLE, getString(R.string.label_select_picture))
-                    .putExtra(DocumentsContract.EXTRA_PROMPT, getString(R.string.label_select_picture))
                     .addCategory(Intent.CATEGORY_OPENABLE)
                     ;
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+                intent.putExtra(DocumentsContract.EXTRA_PROMPT, getString(R.string.label_select_picture));
+            }
 
             startActivityForResult(Intent.createChooser(intent, getString(R.string.label_select_picture)), requestId);
         }
@@ -618,22 +620,21 @@ abstract class CropAreasChooseBaseActivity extends BaseActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        Integer rotation = menu2Rotation.get(item.getItemId());
+        int menuItemId = item.getItemId();
+        Integer rotation = menu2Rotation.get(menuItemId);
         if (rotation != null) {
             this.setRotation(rotation);
             uCropView.setRotatedDegrees(this.getRotation());
             return true;
         }
-        switch (item.getItemId()) {
-            case R.id.menu_save:
-                return edit.saveAsPublicCroppedImage();
-            case R.id.menu_send:
-                return send.sendPrivateCroppedImage();
-            case R.id.menu_get_content:
-                return content.returnPrivateCroppedImage();
-            default:
-                return super.onOptionsItemSelected(item);
+        if (menuItemId == R.id.menu_save) {
+            return edit.saveAsPublicCroppedImage();
+        } else if (menuItemId == R.id.menu_send) {
+            return send.sendPrivateCroppedImage();
+        } else if (menuItemId == R.id.menu_get_content) {
+            return content.returnPrivateCroppedImage();
+        } else {
+            return super.onOptionsItemSelected(item);
         }
-        // return true;
     }
 }

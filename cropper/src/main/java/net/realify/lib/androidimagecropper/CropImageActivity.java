@@ -89,13 +89,6 @@ public class CropImageActivity extends Activity
             ? mOptions.activityTitle
             : getResources().getString(R.string.crop_image_activity_title);
 
-    /*
-    ActionBar actionBar = getSupportActionBar();
-    if (actionBar != null) {
-      actionBar.setTitle(title);
-      actionBar.setDisplayHomeAsUpEnabled(true);
-    }
-    */
     setTitle(title);
   }
 

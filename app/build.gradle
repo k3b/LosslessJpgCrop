@@ -1,12 +1,14 @@
 apply plugin: 'com.android.application'
 
 android {
+    //noinspection GradleCompatible
     compileSdkVersion 28
     defaultConfig {
         applicationId "de.k3b.android.lossless_jpg_crop"
 
         // SAF ACTION_CREATE_DOCUMENT requires api-19 and later
         minSdkVersion 19		// Android 4.4 KitKat (API 19);  Android 5.0 Lollipop (API 21); Android 6.0 Marshmallow (API 23); Android 7.0 Nougat (API 24)
+        //noinspection ExpiredTargetSdkVersion
         targetSdkVersion 29
 
         // 1.0.0.190425 (1)    initial version
@@ -32,7 +34,9 @@ android {
             minifyEnabled true
             // minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-        }
+
+            applicationIdSuffix ".debug"
+            versionNameSuffix "-DEBUG"        }
         release {
             shrinkResources true
             minifyEnabled true
@@ -55,8 +59,8 @@ dependencies {
 
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
     testImplementation 'junit:junit:4.13.2'
-    androidTestImplementation 'androidx.test:runner:1.3.0'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
+    androidTestImplementation 'androidx.test:runner:1.4.0'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
 
 
     // implements lossless croppig
