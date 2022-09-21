@@ -1,4 +1,7 @@
+# <img src="https://raw.githubusercontent.com/k3b/LosslessJpgCrop/master/app/src/main/res/mipmap-xxhdpi/ll_crop.png" alt="llcrop logo" height="30"/> LLCrop
 Loss Less Cropping and Image Rotation: Remove unwanted parts of jpg photo without quality loss.
+
+<img src="https://raw.githubusercontent.com/k3b/LosslessJpgCrop/master/fastlane/metadata/android/en-US/images/featureGraphic.png" alt="Featuregraphic of llcrop" height="250" />
 
 While there are many apps capable of cropping images (often with additional features), 
 they generally cause quality loss because they 
