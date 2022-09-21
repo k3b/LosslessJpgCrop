@@ -16,6 +16,7 @@ import android.provider.DocumentsContract;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.core.app.ActivityCompat;
@@ -271,6 +272,7 @@ abstract class CropAreasChooseBaseActivity extends BaseActivity {
     protected static final String IMAGE_JPEG_MIME = "image/jpeg";
 
     protected CropImageView uCropView = null;
+    protected TextView txtStatus = null;
     private ImageProcessor mSpectrum;
 
     // #7: workaround rotation change while picker is open causes Activity re-create without
@@ -283,9 +285,32 @@ abstract class CropAreasChooseBaseActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_crop);
         uCropView = findViewById(R.id.ucrop);
+        txtStatus = findViewById(R.id.status);
 
+        uCropView.setOnSetCropOverlayMovedListener(new CropImageView.OnSetCropOverlayMovedListener() {
+            @Override
+            public void onCropOverlayMoved(Rect rect) {
+                onUpdateCropping();
+            }
+        });
         mSpectrum = new ImageProcessor();
 
+    }
+
+    private void onUpdateCropping() {
+        String cropInfo = toString(getCropRect());
+        txtStatus.setText(cropInfo);
+        Log.d(TAG, getInstanceNo4Debug() + "onUpdateCropping(crop=" + cropInfo + ")");
+    }
+
+    public String toString(Rect r) {
+        StringBuilder sb = new StringBuilder();
+
+                sb
+                .append('(').append(r.left).append(',').append(r.top).append(") .. (")
+                .append(r.right).append(',').append(r.bottom).append(") => [")
+                        .append(r.width()).append('x').append(r.height()).append(']');
+        return sb.toString();
     }
 
     protected void finishIfMainMethod(int idMenuMainMethod) {
@@ -304,9 +329,6 @@ abstract class CropAreasChooseBaseActivity extends BaseActivity {
 
     protected void SetImageUriAndLastCropArea(Uri uri, Rect crop) {
         try {
-
-            /*
-            */
             if (LOAD_ASYNC) {
                 uCropView.setImageUriAsync(uri);
             } else {
@@ -604,6 +626,17 @@ abstract class CropAreasChooseBaseActivity extends BaseActivity {
     @Override
     public boolean onCreateOptionsMenu(final Menu menu) {
         getMenuInflater().inflate(R.menu.menu_rotate, menu);
+//        getMenuInflater().inflate(R.menu.menu_aspect_ratio, menu);
+
+/*
+    Format 3:4:
+            9x11,10x13,11x15,13x17,20x27,30x40
+    Format 2:3:
+            9x13,10x15,11x17,13x18,20x30,30x45
+    Format 9:16:
+            9x15,10x18
+*/
+
         return true;
     }
 
