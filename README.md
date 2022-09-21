@@ -17,17 +17,21 @@ features (e.g. support for other file formats, add resize-support or adding text
 
 ---
 
-## Supported Workflows:
+## Supported Workflows and Features:
 
-* [#1](https://github.com/k3b/LosslessJpgCrop/issues/1) From Android **app launcher**:
+* Workflow [#1](https://github.com/k3b/LosslessJpgCrop/issues/1) : From Android **app launcher**:
     * Pick an image and crop it to a new public file
-* [#1](https://github.com/k3b/LosslessJpgCrop/issues/1) From any **file manager** or **gallery app** that supports [intent-action-EDIT](https://developer.android.com/reference/android/content/Intent#ACTION_EDIT) for MIME *image/jpeg*:
-	* Crop current selected image to a new public file
-* [#2](https://github.com/k3b/LosslessJpgCrop/issues/2): From any app that supports [intent-action-SEND](https://developer.android.com/reference/android/content/Intent#ACTION_SEND) or [intent-action-SEND-TO](https://developer.android.com/reference/android/content/Intent#ACTION_SENDTO) for MIME *image/jpeg*
-	* Send/SendTo/Share a cropped version of the currently selected image 
-* [#3](https://github.com/k3b/LosslessJpgCrop/issues/3)/[#8](https://github.com/k3b/LosslessJpgCrop/issues/8): From any app that supports [intent-action-GET-CONTENT](https://developer.android.com/reference/android/content/Intent#ACTION_GET_CONTENT) or intent-action-PICK for MIME *image/jpeg*
-	* Open/Pick the cropping of an uncropped image
-* [#17](https://github.com/k3b/LosslessJpgCrop/issues/17) : added support for image rotation
+* Workflow [#1](https://github.com/k3b/LosslessJpgCrop/issues/1) : From any **file manager** or **gallery app** that supports [intent-action-EDIT](https://developer.android.com/reference/android/content/Intent#ACTION_EDIT) for MIME *image/jpeg*:
+    * Crop current selected image to a new public file
+* Workflow [#2](https://github.com/k3b/LosslessJpgCrop/issues/2) : From any app that supports [intent-action-SEND](https://developer.android.com/reference/android/content/Intent#ACTION_SEND) or [intent-action-SEND-TO](https://developer.android.com/reference/android/content/Intent#ACTION_SENDTO) for MIME *image/jpeg*
+    * Send/SendTo/Share a cropped version of the currently selected image 
+* Workflow [#3](https://github.com/k3b/LosslessJpgCrop/issues/3)/[#8](https://github.com/k3b/LosslessJpgCrop/issues/8) : From any app that supports [intent-action-GET-CONTENT](https://developer.android.com/reference/android/content/Intent#ACTION_GET_CONTENT) or intent-action-PICK for MIME *image/jpeg*
+    * Open/Pick the cropping of an uncropped image
+* Feature [#17](https://github.com/k3b/LosslessJpgCrop/issues/17) : added support for image rotation
+* Feature [#35](https://github.com/k3b/LosslessJpgCrop/issues/35) : Display crop box coordinates and size
+    * Show XY offset of of top left corner of crop box displayed along with it's dimensions. 
+    * One can get more predictable results by sticking to 8 or 16 multiples for offset and box size allows to target aspect ratio.
+
 ---
 
 ## Requirements
