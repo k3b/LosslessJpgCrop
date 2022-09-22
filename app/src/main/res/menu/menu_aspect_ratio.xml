@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <item android:id="@+id/menu_aspect_ratio"
+
+        android:showAsAction="ifRoom"
+        android:icon="@android:drawable/ic_menu_crop"
+        android:title="Aspect Ratio"
+        android:orderInCategory="70"
+        tools:ignore="AppCompatResource" >
+        <menu>
+                <item android:id="@+id/menu_ratio_free"
+                    android:showAsAction="never"
+                    android:title="Free"
+                    android:checkable="true"
+                    android:checked="true"
+                    tools:ignore="AppCompatResource" />
+                <item android:id="@+id/menu_ratio_square"
+                    android:showAsAction="never"
+                    android:title="Square"
+                    android:checkable="true"
+                    tools:ignore="AppCompatResource" />
+                <item android:id="@+id/menu_ratio_userdefined"
+                    android:showAsAction="never"
+                    android:title="userdefined"
+                    android:checkable="true"
+                    tools:ignore="AppCompatResource" />
+
+                <item android:title="9x11"  />
+                <item android:title="9x13" />
+                <item android:title="9x15" />
+                <item android:title="10x13" />
+                <item android:title="10x15" />
+                <item android:title="13x18" />
+<!--
+            /*
+            Format 3:4:
+            9x11,10x13,11x15,13x17,20x27,30x40
+            Format 2:3:
+            9x13,10x15,11x17,13x18,20x30,30x45
+            Format 9:16:
+            9x15,10x18
+            */
+-->
+        </menu>
+    </item>
+</menu>

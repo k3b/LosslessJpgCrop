@@ -16,6 +16,7 @@ import android.provider.DocumentsContract;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.SubMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -45,7 +46,12 @@ import de.k3b.util.TempFileUtil;
  */
 abstract class CropAreasChooseBaseActivity extends BaseActivity {
     protected static final String TAG = "LLCrop";
+
+    private static final String STATE_CURRENT_CROP_AREA = "CURRENT_CROP_AREA";
+    private static final String STATE_CURRENT_ASPECT_RATIO = "KEY_ASPECT_RATIO";
+
     protected static final boolean LOAD_ASYNC = false;
+    private static final boolean ENABLE_ASPECT_RATIO = false;
 
     private static int lastInstanceNo4Debug = 0;
     private int instanceNo4Debug = 0;
@@ -53,6 +59,16 @@ abstract class CropAreasChooseBaseActivity extends BaseActivity {
     private final int idMenuMainMethod;
     private final Map<Integer, Integer> menu2Rotation;
 
+    protected static final String IMAGE_JPEG_MIME = "image/jpeg";
+
+    protected CropImageView uCropView = null;
+    protected TextView txtStatus = null;
+    private ImageProcessor mSpectrum;
+    private String aspectRatio = null;
+
+    // #7: workaround rotation change while picker is open causes Activity re-create without
+    // uCropView recreation completed.
+    private Rect mLastCropRect = null;
     protected CropAreasChooseBaseActivity(int idMenuMainMethod) {
         this.idMenuMainMethod = idMenuMainMethod;
         menu2Rotation = new HashMap<>();
@@ -199,7 +215,7 @@ abstract class CropAreasChooseBaseActivity extends BaseActivity {
                     close(inStream, inStream);
                 }
             } else {
-                // uri==null or error
+                // outUri==null or error
                 Log.i(TAG, getInstanceNo4Debug() + "onOpenPublicOutputUriPickerResult(null): No output url, not saved.");
             }
         }
@@ -207,8 +223,8 @@ abstract class CropAreasChooseBaseActivity extends BaseActivity {
     protected Edit edit = new Edit();
 
     protected class Send {
-        protected void onGetSendImage(Uri uri, Bundle savedInstanceState) {
-            SetImageUriAndLastCropArea(uri, savedInstanceState);
+        protected void onGetSendImage(Uri imageUri, Bundle savedInstanceState) {
+            SetImageUriAndLastCropArea(imageUri, savedInstanceState);
         }
 
         protected boolean sendPrivateCroppedImage() {
@@ -268,17 +284,6 @@ abstract class CropAreasChooseBaseActivity extends BaseActivity {
     }
     protected Send send = new Send();
 
-    private static final String CURRENT_CROP_AREA = "CURRENT_CROP_AREA";
-    protected static final String IMAGE_JPEG_MIME = "image/jpeg";
-
-    protected CropImageView uCropView = null;
-    protected TextView txtStatus = null;
-    private ImageProcessor mSpectrum;
-
-    // #7: workaround rotation change while picker is open causes Activity re-create without
-    // uCropView recreation completed.
-    private Rect mLastCropRect = null;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         instanceNo4Debug = ++lastInstanceNo4Debug;
@@ -287,14 +292,45 @@ abstract class CropAreasChooseBaseActivity extends BaseActivity {
         uCropView = findViewById(R.id.ucrop);
         txtStatus = findViewById(R.id.status);
 
+        if (savedInstanceState != null) {
+            aspectRatio = savedInstanceState.getString(STATE_CURRENT_ASPECT_RATIO, aspectRatio);
+        }
+        mSpectrum = new ImageProcessor();
+
         uCropView.setOnSetCropOverlayMovedListener(new CropImageView.OnSetCropOverlayMovedListener() {
             @Override
             public void onCropOverlayMoved(Rect rect) {
                 onUpdateCropping();
             }
         });
-        mSpectrum = new ImageProcessor();
 
+        setAspectRatio(aspectRatio);
+    }
+
+    private void setAspectRatio(String aspectRatio) {
+        String[] xy = (aspectRatio == null) ? null : aspectRatio.split("x");
+
+        if (xy == null) {
+            uCropView.clearAspectRatio();
+        } else {
+            try {
+                int x = Integer.parseInt(xy[0]);
+                int y = Integer.parseInt(xy[1]);
+                uCropView.setAspectRatio(x, y);
+                if (x >= 100 && y >= 100) {
+                    uCropView.setMinCropResultSize(x,y);
+                    uCropView.setMaxCropResultSize(x,y);
+                } else {
+                    uCropView.setMinCropResultSize(40,99999);
+                    uCropView.setMaxCropResultSize(40,99999);
+                }
+            } catch (Exception ex) {
+                String message = "setAspectRatio('" + aspectRatio + "') . Valid example '7x13'";
+                Log.e(TAG, getInstanceNo4Debug() + message);
+
+                // throw new IllegalArgumentException(message, ex);
+            }
+        }
     }
 
     private void onUpdateCropping() {
@@ -319,22 +355,22 @@ abstract class CropAreasChooseBaseActivity extends BaseActivity {
         }
     }
 
-    protected void SetImageUriAndLastCropArea(Uri uri, Bundle savedInstanceState) {
+    protected void SetImageUriAndLastCropArea(Uri imageUri, Bundle savedInstanceState) {
         final Rect crop = (Rect) ((savedInstanceState == null)
                 ? null
-                : savedInstanceState.getParcelable(CURRENT_CROP_AREA));
+                : savedInstanceState.getParcelable(STATE_CURRENT_CROP_AREA));
 
-        SetImageUriAndLastCropArea(uri, crop);
+        SetImageUriAndLastCropArea(imageUri, crop);
     }
 
-    protected void SetImageUriAndLastCropArea(Uri uri, Rect crop) {
+    protected void SetImageUriAndLastCropArea(Uri imageUri, Rect crop) {
         try {
             if (LOAD_ASYNC) {
-                uCropView.setImageUriAsync(uri);
+                uCropView.setImageUriAsync(imageUri);
             } else {
-                InputStream stream = getContentResolver().openInputStream(uri);
+                InputStream stream = getContentResolver().openInputStream(imageUri);
                 Bitmap bitmap = BitmapFactory.decodeStream(stream);
-                ExifInterface exif = getExif(this, uri);
+                ExifInterface exif = getExif(this, imageUri);
                 uCropView.setImageBitmap(bitmap, exif);
                 if (exif != null) {
                     setBaseRotation(exif.getRotationDegrees());
@@ -344,16 +380,16 @@ abstract class CropAreasChooseBaseActivity extends BaseActivity {
             
 
         } catch (Exception e) {
-            final String msg = getInstanceNo4Debug() + "SetImageUriAndLastCropArea '" + uri + "' ";
+            final String msg = getInstanceNo4Debug() + "SetImageUriAndLastCropArea '" + imageUri + "' ";
             Log.e(TAG, msg, e);
             Toast.makeText(this, msg + e.getMessage(), Toast.LENGTH_LONG).show();
         }
     }
 
-    private static ExifInterface getExif(Context context, Uri uri) {
+    private static ExifInterface getExif(Context context, Uri imageUri) {
         InputStream is = null;
         try {
-            is = context.getContentResolver().openInputStream(uri);
+            is = context.getContentResolver().openInputStream(imageUri);
             if (is != null) {
                 ExifInterface ei = new ExifInterface(is);
                 is.close();
@@ -392,7 +428,7 @@ abstract class CropAreasChooseBaseActivity extends BaseActivity {
             if (LOAD_ASYNC) {
                 uCropView.setOnSetImageUriCompleteListener(new CropImageView.OnSetImageUriCompleteListener() {
                     @Override
-                    public void onSetImageUriComplete(CropImageView view, Uri uri, Exception error) {
+                    public void onSetImageUriComplete(CropImageView view, Uri imageUri, Exception error) {
                         // called when uCropView recreation is completed.
                         uCropView.setCropRect(crop);
                         Rect newCrop = getCropRect();
@@ -428,7 +464,9 @@ abstract class CropAreasChooseBaseActivity extends BaseActivity {
 
         Rect crop = getCropRect();
         Log.d(TAG, getInstanceNo4Debug() + "onSaveInstanceState : crop=" + crop);
-        outState.putParcelable(CURRENT_CROP_AREA, crop);
+        outState.putParcelable(STATE_CURRENT_CROP_AREA, crop);
+        outState.putString(STATE_CURRENT_ASPECT_RATIO, aspectRatio);
+
     }
 
     private void pickFromGallery(int requestId, int requestPermissionId) {
@@ -460,7 +498,7 @@ abstract class CropAreasChooseBaseActivity extends BaseActivity {
             return URLDecoder.decode(outUri.toString(), StandardCharsets.UTF_8.toString());
         } catch (Exception e) {
             //!!! UnsupportedEncodingException, IllegalCharsetNameException
-            Log.e(TAG, getInstanceNo4Debug() + "err cannot convert uri to string('" + outUri.toString() + "').", e);
+            Log.e(TAG, getInstanceNo4Debug() + "err cannot convert imageUri to string('" + outUri.toString() + "').", e);
             return outUri.toString();
         }
     }
@@ -596,7 +634,7 @@ abstract class CropAreasChooseBaseActivity extends BaseActivity {
                 close(inStream, inStream);
             }
         } else {
-            Log.e(TAG, getInstanceNo4Debug() + "Error cropToSharedUri(): Missing input uri.");
+            Log.e(TAG, getInstanceNo4Debug() + "Error cropToSharedUri(): Missing input imageUri.");
         }
         return outUri;
     }
@@ -626,7 +664,9 @@ abstract class CropAreasChooseBaseActivity extends BaseActivity {
     @Override
     public boolean onCreateOptionsMenu(final Menu menu) {
         getMenuInflater().inflate(R.menu.menu_rotate, menu);
-//        getMenuInflater().inflate(R.menu.menu_aspect_ratio, menu);
+        if (ENABLE_ASPECT_RATIO) {
+            getMenuInflater().inflate(R.menu.menu_aspect_ratio, menu);
+        }
 
 /*
     Format 3:4:
@@ -647,7 +687,20 @@ abstract class CropAreasChooseBaseActivity extends BaseActivity {
                 menu.findItem(key).setChecked(getRotation() == menu2Rotation.get(key));
             }
         }
+        if (ENABLE_ASPECT_RATIO) {
+            SubMenu menuCrop = menu.findItem(R.menu.menu_aspect_ratio).getSubMenu();
+            for (int i = menuCrop.size() - 1; i >= 0; i--) {
+                MenuItem item = menuCrop.getItem(i);
+                item.setCheckable(true);
+                item.setChecked(isCheckedAspectRatio(item));
+            }
+        }
         return super.onPrepareOptionsMenu(menu);
+    }
+
+    private boolean isCheckedAspectRatio(MenuItem item) {
+        // !!! ENABLE_ASPECT_RATIO
+        return item.getItemId() == Menu.NONE && item.getTitle() != null;
     }
 
 
