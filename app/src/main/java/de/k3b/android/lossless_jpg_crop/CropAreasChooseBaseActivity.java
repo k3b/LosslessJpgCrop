@@ -70,7 +70,7 @@ abstract class CropAreasChooseBaseActivity extends BaseActivity implements Defin
 
     protected static final boolean LOAD_ASYNC = false;
     private static final boolean ENABLE_ASPECT_RATIO = true;
-    public static final String ASPECT_RATIO_SQUARE = "8x8";
+    private static final String ASPECT_RATIO_SQUARE = "8x8";
 
     private static int lastInstanceNo4Debug = 0;
     private int instanceNo4Debug = 0;
@@ -337,11 +337,16 @@ abstract class CropAreasChooseBaseActivity extends BaseActivity implements Defin
                 int x = Integer.parseInt(xy[0]);
                 int y = Integer.parseInt(xy[1]);
                 uCropView.setAspectRatio(x, y);
+                uCropView.setMinCropResultSize(x,y);
                 if (x >= 100 && y >= 100) {
-                    uCropView.setMinCropResultSize(x,y);
                     uCropView.setMaxCropResultSize(x,y);
+
+                    Rect cropRect = getCropRect();
+                    if (cropRect.width() != x || cropRect.height() != y) {
+                        mLastCropRect = new Rect(0, 0, x, y);
+                        uCropView.setCropRect(mLastCropRect);
+                    }
                 } else {
-                    uCropView.setMinCropResultSize(40,40);
                     uCropView.setMaxCropResultSize(99999,99999);
                 }
             } catch (Exception ex) {
@@ -351,12 +356,17 @@ abstract class CropAreasChooseBaseActivity extends BaseActivity implements Defin
                 // throw new IllegalArgumentException(message, ex);
             }
         }
+        onUpdateCropping();
+        uCropView.invalidate();
     }
 
     private void onUpdateCropping() {
-        String cropInfo = toString(getCropRect());
-        txtStatus.setText(cropInfo);
-        Log.d(TAG, getInstanceNo4Debug() + "onUpdateCropping(crop=" + cropInfo + ")");
+        Rect cropRect = getCropRect();
+        if (cropRect != null) {
+            String cropInfo = toString(cropRect);
+            txtStatus.setText(cropInfo);
+            Log.d(TAG, getInstanceNo4Debug() + "onUpdateCropping(crop=" + cropInfo + ")");
+        }
     }
 
     public String toString(Rect r) {
@@ -366,6 +376,10 @@ abstract class CropAreasChooseBaseActivity extends BaseActivity implements Defin
                 .append('(').append(r.left).append(',').append(r.top).append(") .. (")
                 .append(r.right).append(',').append(r.bottom).append(") => [")
                         .append(r.width()).append('x').append(r.height()).append(']');
+
+                if (this.currentAspectRatioString != null) {
+                    sb.append("   {").append(currentAspectRatioString).append("}");
+                }
         return sb.toString();
     }
 
@@ -752,6 +766,7 @@ abstract class CropAreasChooseBaseActivity extends BaseActivity implements Defin
             uCropView.setRotatedDegrees(this.getRotation());
             return true;
         }
+
         if (menuItemId == R.id.menu_save) {
             return edit.saveAsPublicCroppedImage();
         } else if (menuItemId == R.id.menu_send) {
@@ -769,15 +784,28 @@ abstract class CropAreasChooseBaseActivity extends BaseActivity implements Defin
             setAspectRatio(null);
             return true;
         } else if (menuItemId == R.id.menu_ratio_userdefined) {
-            /* !!! todo
-                    R.id.menu_ratio_free
-                    R.id.menu_ratio_square
-                    R.id.menu_ratio_userdefined
-                     */
-            return false;
+            return onRatioUserdefined((currentAspectRatioString == null) ? null : currentAspectRatioString.split("x"));
         } else {
             return super.onOptionsItemSelected(item);
         }
+    }
+
+    private boolean onRatioUserdefined(String[] paramXY) {
+        String x,y;
+        if (paramXY != null && paramXY.length > 1) {
+            x = paramXY[0];
+            y = paramXY[1];
+        } else {
+            Rect rect = uCropView.getCropRect();
+            x = "" + rect.width();
+            y = "" + rect.height();
+        }
+
+        DefineAspectRatioFragment fragment = DefineAspectRatioFragment.newInstance(x, y);
+
+        fragment.show(getFragmentManager(),"onRatioUserdefined");
+        return true;
+
     }
 
     public void onDefineAspectRatio(String width, String height) {

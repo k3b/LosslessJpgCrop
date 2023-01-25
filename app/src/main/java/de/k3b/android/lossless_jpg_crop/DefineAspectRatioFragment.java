@@ -57,15 +57,14 @@ public class DefineAspectRatioFragment extends DialogFragment {
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
      *
-     * @param paramWidth aspect ratio width
-     * @param paramHeight aspect ratio height
+     * @param paramXY aspect ratio width and height
      * @return A new instance of fragment DefineAspectRatioFragment.
      */
-    public static DefineAspectRatioFragment newInstance(String paramWidth, String paramHeight) {
+    public static DefineAspectRatioFragment newInstance(String... paramXY) {
         DefineAspectRatioFragment fragment = new DefineAspectRatioFragment();
         Bundle args = new Bundle();
-        args.putString(PARAM_WIDTH, paramWidth);
-        args.putString(PARAM_HEIGHT, paramHeight);
+        args.putString(PARAM_WIDTH, paramXY[0]);
+        args.putString(PARAM_HEIGHT, paramXY[1]);
         fragment.setArguments(args);
         return fragment;
     }
@@ -105,13 +104,13 @@ public class DefineAspectRatioFragment extends DialogFragment {
             @Override
             public void onClick(View v) {
                 onOk();
-                onCancel(getDialog());
+                dismiss();
             }
         });
         view.<Button>findViewById(R.id.cmd_cancel).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                onCancel(getDialog());
+                dismiss();
             }
         });
         view.<Button>findViewById(R.id.cmd_swap).setOnClickListener(new View.OnClickListener() {
