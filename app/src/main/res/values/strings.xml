@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
 English translation by k3b.
 
 Note for translators: there are different files that contain translations.
@@ -13,7 +12,7 @@ Example: for Norwegian Bokmål translations these files are affected:
 * .../LosslessJpgCrop/app/build.gradle: android.defaultConfig.resConfigs "de","nb-rNO","it" // make shure "nb-rNO" is included
 
 
-Copyright (C) 2019 k3b
+Copyright (C) 2019-2023 by k3b
 
 This file is part of de.k3b.android.lossless_jpg_crop (https://github.com/k3b/LosslessJpgCrop/)
 
@@ -46,4 +45,6 @@ this program. If not, see <http://www.gnu.org/licenses/>
     <string name="toast_saved_error">Cannot save as \'%1$s\'.\n\n%2$s</string>
     <string name="label_rotate">Rotate ...</string>
     <string name="permission_error">Missing permisions</string>
+
+    <string name="label_define_aspect_ratio">Define Aspect Ratio</string>
 </resources>

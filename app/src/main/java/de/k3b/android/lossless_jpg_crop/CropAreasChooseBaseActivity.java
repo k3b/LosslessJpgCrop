@@ -1,3 +1,21 @@
+/*
+Copyright (C) 2019-2023 by k3b
+
+This file is part of de.k3b.android.lossless_jpg_crop (https://github.com/k3b/losslessJpgCrop/)
+
+This program is free software: you can redistribute it and/or modify it
+under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+
+You should have received a copy of the GNU General Public License along with
+this program. If not, see <http://www.gnu.org/licenses/>
+ */
 package de.k3b.android.lossless_jpg_crop;
 
 import android.Manifest;
@@ -44,14 +62,15 @@ import de.k3b.util.TempFileUtil;
  * * Displays the cropping gui
  * * Contains Protected helpers for common functionalities
  */
-abstract class CropAreasChooseBaseActivity extends BaseActivity {
+abstract class CropAreasChooseBaseActivity extends BaseActivity implements DefineAspectRatioFragment.AspectRatioHandler {
     protected static final String TAG = "LLCrop";
 
     private static final String STATE_CURRENT_CROP_AREA = "CURRENT_CROP_AREA";
     private static final String STATE_CURRENT_ASPECT_RATIO = "KEY_ASPECT_RATIO";
 
     protected static final boolean LOAD_ASYNC = false;
-    private static final boolean ENABLE_ASPECT_RATIO = false;
+    private static final boolean ENABLE_ASPECT_RATIO = true;
+    public static final String ASPECT_RATIO_SQUARE = "8x8";
 
     private static int lastInstanceNo4Debug = 0;
     private int instanceNo4Debug = 0;
@@ -64,7 +83,9 @@ abstract class CropAreasChooseBaseActivity extends BaseActivity {
     protected CropImageView uCropView = null;
     protected TextView txtStatus = null;
     private ImageProcessor mSpectrum;
-    private String aspectRatio = null;
+
+    /** Same as last selected menu item text i.e. 9x13 */
+    private String currentAspectRatioString = null;
 
     // #7: workaround rotation change while picker is open causes Activity re-create without
     // uCropView recreation completed.
@@ -164,12 +185,10 @@ abstract class CropAreasChooseBaseActivity extends BaseActivity {
             Toast.makeText(getBaseContext(), R.string.toast_cannot_retrieve_selected_image, Toast.LENGTH_SHORT).show();
             finishIfMainMethod(R.id.menu_save);
         }
-        protected void onSaveEditPictureAsOutputUriPickerResult(Uri _outUri) {
+        protected void onSaveEditPictureAsOutputUriPickerResult(Uri outUri) {
 
             // use to provoke an error to test error handling
-            // Uri outUri = Uri.parse(_outUri + "-err");
-
-            Uri outUri = _outUri;
+            // Uri outUri = Uri.parse(outUri + "-err");
 
             final Uri inUri = getSourceImageUri(getIntent());
 
@@ -200,7 +219,7 @@ abstract class CropAreasChooseBaseActivity extends BaseActivity {
 
                     try {
                         // #14: delete affected file as it is useless
-                        DocumentsContract.deleteDocument(getContentResolver(), _outUri);
+                        DocumentsContract.deleteDocument(getContentResolver(), outUri);
                     } catch (Exception exDelete) {
                         // ignore if useless file cannot be deleted
                     }
@@ -293,7 +312,7 @@ abstract class CropAreasChooseBaseActivity extends BaseActivity {
         txtStatus = findViewById(R.id.status);
 
         if (savedInstanceState != null) {
-            aspectRatio = savedInstanceState.getString(STATE_CURRENT_ASPECT_RATIO, aspectRatio);
+            currentAspectRatioString = savedInstanceState.getString(STATE_CURRENT_ASPECT_RATIO, currentAspectRatioString);
         }
         mSpectrum = new ImageProcessor();
 
@@ -304,10 +323,11 @@ abstract class CropAreasChooseBaseActivity extends BaseActivity {
             }
         });
 
-        setAspectRatio(aspectRatio);
+        setAspectRatio(currentAspectRatioString);
     }
 
     private void setAspectRatio(String aspectRatio) {
+        this.currentAspectRatioString = aspectRatio;
         String[] xy = (aspectRatio == null) ? null : aspectRatio.split("x");
 
         if (xy == null) {
@@ -321,8 +341,8 @@ abstract class CropAreasChooseBaseActivity extends BaseActivity {
                     uCropView.setMinCropResultSize(x,y);
                     uCropView.setMaxCropResultSize(x,y);
                 } else {
-                    uCropView.setMinCropResultSize(40,99999);
-                    uCropView.setMaxCropResultSize(40,99999);
+                    uCropView.setMinCropResultSize(40,40);
+                    uCropView.setMaxCropResultSize(99999,99999);
                 }
             } catch (Exception ex) {
                 String message = "setAspectRatio('" + aspectRatio + "') . Valid example '7x13'";
@@ -465,7 +485,7 @@ abstract class CropAreasChooseBaseActivity extends BaseActivity {
         Rect crop = getCropRect();
         Log.d(TAG, getInstanceNo4Debug() + "onSaveInstanceState : crop=" + crop);
         outState.putParcelable(STATE_CURRENT_CROP_AREA, crop);
-        outState.putString(STATE_CURRENT_ASPECT_RATIO, aspectRatio);
+        outState.putString(STATE_CURRENT_ASPECT_RATIO, currentAspectRatioString);
 
     }
 
@@ -497,7 +517,7 @@ abstract class CropAreasChooseBaseActivity extends BaseActivity {
         try {
             return URLDecoder.decode(outUri.toString(), StandardCharsets.UTF_8.toString());
         } catch (Exception e) {
-            //!!! UnsupportedEncodingException, IllegalCharsetNameException
+            // UnsupportedEncodingException, IllegalCharsetNameException
             Log.e(TAG, getInstanceNo4Debug() + "err cannot convert imageUri to string('" + outUri.toString() + "').", e);
             return outUri.toString();
         }
@@ -688,21 +708,40 @@ abstract class CropAreasChooseBaseActivity extends BaseActivity {
             }
         }
         if (ENABLE_ASPECT_RATIO) {
-            SubMenu menuCrop = menu.findItem(R.menu.menu_aspect_ratio).getSubMenu();
-            for (int i = menuCrop.size() - 1; i >= 0; i--) {
-                MenuItem item = menuCrop.getItem(i);
-                item.setCheckable(true);
-                item.setChecked(isCheckedAspectRatio(item));
+            MenuItem menuAspectRatio = menu.findItem(R.id.menu_aspect_ratio);
+            if (menuAspectRatio != null) {
+                SubMenu menuCrop = menuAspectRatio.getSubMenu();
+                for (int i = menuCrop.size() - 1; i >= 0; i--) {
+                    MenuItem item = menuCrop.getItem(i);
+                    item.setCheckable(true);
+                    item.setChecked(isCurrentAspectRatio(item));
+                }
             }
         }
         return super.onPrepareOptionsMenu(menu);
     }
 
-    private boolean isCheckedAspectRatio(MenuItem item) {
-        // !!! ENABLE_ASPECT_RATIO
-        return item.getItemId() == Menu.NONE && item.getTitle() != null;
+    /**
+     * @return true if Menu.NONE with ratio in title
+     */
+    private boolean isAspectRatio(MenuItem item) {
+        return item.getItemId() == Menu.NONE
+                && item.getTitle() != null;
     }
 
+    /**
+     * @return true if item is the current selected ratio
+     */
+    private boolean isCurrentAspectRatio(MenuItem item) {
+        if (currentAspectRatioString == null) {
+            return item.getItemId() == R.id.menu_ratio_free;
+        } else if (currentAspectRatioString.equals(ASPECT_RATIO_SQUARE)) {
+            return item.getItemId() == R.id.menu_ratio_square;
+        } else {
+            return isAspectRatio(item)
+                    && currentAspectRatioString.equalsIgnoreCase(item.getTitle().toString());
+        }
+    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -719,8 +758,30 @@ abstract class CropAreasChooseBaseActivity extends BaseActivity {
             return send.sendPrivateCroppedImage();
         } else if (menuItemId == R.id.menu_get_content) {
             return content.returnPrivateCroppedImage();
+        } else if (isAspectRatio(item)) {
+            // Menu.NONE with ratio in title
+            setAspectRatio(item.getTitle().toString());
+            return true;
+        } else if (menuItemId == R.id.menu_ratio_square) {
+            setAspectRatio(ASPECT_RATIO_SQUARE);
+            return true;
+        } else if (menuItemId == R.id.menu_ratio_free) {
+            setAspectRatio(null);
+            return true;
+        } else if (menuItemId == R.id.menu_ratio_userdefined) {
+            /* !!! todo
+                    R.id.menu_ratio_free
+                    R.id.menu_ratio_square
+                    R.id.menu_ratio_userdefined
+                     */
+            return false;
         } else {
             return super.onOptionsItemSelected(item);
         }
     }
+
+    public void onDefineAspectRatio(String width, String height) {
+        setAspectRatio(width + "x" + height);
+    }
+
 }
