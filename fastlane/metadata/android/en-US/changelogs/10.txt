@@ -1,2 +1,2 @@
+New Feature [#15 predefined crop size](https://github.com/k3b/LosslessJpgCrop/issues/15)
 New Feature [#35 Display crop box coordinates and size](https://github.com/k3b/LosslessJpgCrop/issues/35)
-??? #15 predefined crop size

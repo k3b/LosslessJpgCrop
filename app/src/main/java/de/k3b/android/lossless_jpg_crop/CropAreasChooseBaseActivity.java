@@ -71,6 +71,9 @@ abstract class CropAreasChooseBaseActivity extends BaseActivity implements Defin
     protected static final boolean LOAD_ASYNC = false;
     private static final boolean ENABLE_ASPECT_RATIO = true;
     private static final String ASPECT_RATIO_SQUARE = "8x8";
+    public static final int SIZE_MIN = 40;
+    public static final int SIZE_MAX = 99999;
+    public static final int SIZE_ABSOLUTE_TRESHHOLD = 100;
 
     private static int lastInstanceNo4Debug = 0;
     private int instanceNo4Debug = 0;
@@ -86,6 +89,9 @@ abstract class CropAreasChooseBaseActivity extends BaseActivity implements Defin
 
     /** Same as last selected menu item text i.e. 9x13 */
     private String currentAspectRatioString = null;
+
+    private int rotationBeforeCrop = 0;
+    private int rotationAfterCrop = 0;
 
     // #7: workaround rotation change while picker is open causes Activity re-create without
     // uCropView recreation completed.
@@ -327,33 +333,41 @@ abstract class CropAreasChooseBaseActivity extends BaseActivity implements Defin
     }
 
     private void setAspectRatio(String aspectRatio) {
+        // allow "no aspect ratio" and "any size"
+        uCropView.setAspectRatio(SIZE_MIN, SIZE_MIN);
+        uCropView.setMaxCropResultSize(SIZE_MAX, SIZE_MAX);
+        uCropView.clearAspectRatio();
+
         this.currentAspectRatioString = aspectRatio;
         String[] xy = (aspectRatio == null) ? null : aspectRatio.split("x");
 
-        if (xy == null) {
-            uCropView.clearAspectRatio();
-        } else {
+        if (xy != null && xy.length >= 2) {
             try {
                 int x = Integer.parseInt(xy[0]);
                 int y = Integer.parseInt(xy[1]);
-                uCropView.setAspectRatio(x, y);
-                uCropView.setMinCropResultSize(x,y);
-                if (x >= 100 && y >= 100) {
-                    uCropView.setMaxCropResultSize(x,y);
-
+                if (x >= SIZE_ABSOLUTE_TRESHHOLD && y >= SIZE_ABSOLUTE_TRESHHOLD) {
                     Rect cropRect = getCropRect();
                     if (cropRect.width() != x || cropRect.height() != y) {
                         mLastCropRect = new Rect(0, 0, x, y);
+
                         uCropView.setCropRect(mLastCropRect);
                     }
+
+                    // fixed AspectRatio, fixed size
+                    uCropView.setAspectRatio(x, y);
+                    uCropView.setMinCropResultSize(x,y);
+                    uCropView.setMaxCropResultSize(x,y);
+
                 } else {
-                    uCropView.setMaxCropResultSize(99999,99999);
+                    // fixed AspectRatio, any size
+                    uCropView.setAspectRatio(x, y);
+                    uCropView.setMinCropResultSize(SIZE_MIN,SIZE_MIN);
+                    uCropView.setMaxCropResultSize(SIZE_MAX, SIZE_MAX);
                 }
+
             } catch (Exception ex) {
                 String message = "setAspectRatio('" + aspectRatio + "') . Valid example '7x13'";
                 Log.e(TAG, getInstanceNo4Debug() + message);
-
-                // throw new IllegalArgumentException(message, ex);
             }
         }
         onUpdateCropping();
@@ -407,7 +421,7 @@ abstract class CropAreasChooseBaseActivity extends BaseActivity implements Defin
                 ExifInterface exif = getExif(this, imageUri);
                 uCropView.setImageBitmap(bitmap, exif);
                 if (exif != null) {
-                    setBaseRotation(exif.getRotationDegrees());
+                    setRotationBeforeCrop(exif.getRotationDegrees());
                 }
             }
             setCropRect(crop);
@@ -469,7 +483,7 @@ abstract class CropAreasChooseBaseActivity extends BaseActivity implements Defin
                         Log.d(TAG, getInstanceNo4Debug() + "delayed onCreate(): crop=" + crop + "/" + newCrop);
                         uCropView.setOnSetImageUriCompleteListener(null);
 
-                        setBaseRotation(uCropView.getRotatedDegrees());
+                        setRotationBeforeCrop(uCropView.getRotatedDegrees());
                     }
                 });
             }
@@ -604,8 +618,8 @@ abstract class CropAreasChooseBaseActivity extends BaseActivity implements Defin
     }
 
     protected void crop(InputStream inStream, OutputStream outStream, Rect rect) throws IOException {
-        int relaqtiverRotation = (360 + getRotation() - getBaseRotation()) % 360;
-        this.mSpectrum.crop(inStream, outStream, rect, relaqtiverRotation);
+        int relativeRotation = (360 + getRotationAfterCrop() - getRotationBeforeCrop()) % 360;
+        this.mSpectrum.crop(inStream, outStream, rect, relativeRotation);
     }
 
     protected File getSharedDir() {
@@ -673,25 +687,22 @@ abstract class CropAreasChooseBaseActivity extends BaseActivity implements Defin
         return outUri;
     }
 
-    private int baseRotation = 0;
-    public void setBaseRotation(int baseRotation) {
-        this.baseRotation = baseRotation % 360;
-        setRotation(this.baseRotation);
+    public void setRotationBeforeCrop(int rotationBeforeCrop) {
+        this.rotationBeforeCrop = rotationBeforeCrop % 360;
+        setRotationAfterCrop(this.rotationBeforeCrop);
     }
 
-    public int getBaseRotation() {
-        return baseRotation;
+    public int getRotationBeforeCrop() {
+        return rotationBeforeCrop;
     }
 
-    private int rotation = 0;
-
-    public int getRotation() {
-        return rotation;
+    public int getRotationAfterCrop() {
+        return rotationAfterCrop;
     }
 
-    public void setRotation(int rotation) {
-        if (rotation != getRotation()) {
-            this.rotation = rotation;
+    public void setRotationAfterCrop(int rotationAfterCrop) {
+        if (rotationAfterCrop != getRotationAfterCrop()) {
+            this.rotationAfterCrop = rotationAfterCrop;
             invalidateOptionsMenu();
         }
     }
@@ -718,7 +729,7 @@ abstract class CropAreasChooseBaseActivity extends BaseActivity implements Defin
     public boolean onPrepareOptionsMenu(Menu menu) {
         for(Integer key : menu2Rotation.keySet()) {
             if (key != null) {
-                menu.findItem(key).setChecked(getRotation() == menu2Rotation.get(key));
+                menu.findItem(key).setChecked(getRotationAfterCrop() == menu2Rotation.get(key));
             }
         }
         if (ENABLE_ASPECT_RATIO) {
@@ -762,8 +773,8 @@ abstract class CropAreasChooseBaseActivity extends BaseActivity implements Defin
         int menuItemId = item.getItemId();
         Integer rotation = menu2Rotation.get(menuItemId);
         if (rotation != null) {
-            this.setRotation(rotation);
-            uCropView.setRotatedDegrees(this.getRotation());
+            this.setRotationAfterCrop(rotation);
+            uCropView.setRotatedDegrees(this.getRotationAfterCrop());
             return true;
         }
 

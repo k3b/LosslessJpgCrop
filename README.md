@@ -27,13 +27,13 @@ features (e.g. support for other file formats, add resize-support or adding text
     * Send/SendTo/Share a cropped version of the currently selected image 
 * Workflow [#3](https://github.com/k3b/LosslessJpgCrop/issues/3)/[#8](https://github.com/k3b/LosslessJpgCrop/issues/8) : From any app that supports [intent-action-GET-CONTENT](https://developer.android.com/reference/android/content/Intent#ACTION_GET_CONTENT) or intent-action-PICK for MIME *image/jpeg*
     * Open/Pick the cropping of an uncropped image
-* Feature [#17](https://github.com/k3b/LosslessJpgCrop/issues/17) : added support for image rotation
-* Feature [#35](https://github.com/k3b/LosslessJpgCrop/issues/35) : Display current crop box coordinates and size
+* Feature [#17](https://github.com/k3b/LosslessJpgCrop/issues/17)  (Since Version 1.2) : added support for image rotation
+* Feature [#35](https://github.com/k3b/LosslessJpgCrop/issues/35) (Since [Version 1.3](https://github.com/k3b/LosslessJpgCrop/milestone/5)) : Display current crop box coordinates and size
     * Show XY offset of top left corner of crop box displayed along with it's dimensions. 
     * One can get more predictable results by sticking to 8 or 16 multiples for offset and box size allows to target aspect ratio.
-* Feature [#15](https://github.com/k3b/LosslessJpgCrop/issues/15) : Define crop box size or aspect ratio
-  * if you set width and height to a value below 100 then you define the aspect ratio of the cropping result
-  * if you set width and height to a value above 100 then you define the absolute size in pixel of the cropping result.
+* Feature [#15](https://github.com/k3b/LosslessJpgCrop/issues/15) (Since [Version 1.3](https://github.com/k3b/LosslessJpgCrop/milestone/5))  : Define crop box size or aspect ratio
+  * if you set width and height to a value below 100 then you define the aspect ratio of the cropping result. Example 9x13
+  * if you set width and height to a value above 100 then you define the absolute size in pixel of the cropping result. Example 400x600
 
 ---
 

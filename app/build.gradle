@@ -20,8 +20,9 @@ android {
         // 1.2.0.191107 (7)    Added jpg Image Rotation
         // 1.2.1.200708 (8)    fix #4: Cropping result image without exif-thumbnail
         // 1.2.2.210416 (9)    Library updates
-        versionCode 9
-        versionName "1.2.2.210416"
+        // 1.3.0.230202 (10)   #15:fixed/modifyable dimensions; #35:Display crop box coordinates and size
+        versionCode 10
+        versionName "1.3.0.230202"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
         // all supported locales. Note: the lib has more translations which are supressed here
