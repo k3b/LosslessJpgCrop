@@ -20,18 +20,18 @@ features (e.g. support for other file formats, add resize-support or adding text
 ## Supported Workflows and Features:
 
 * Workflow [#1](https://github.com/k3b/LosslessJpgCrop/issues/1) : From Android **app launcher**:
-    * Pick an image and crop it to a new public file
+    * Pick an image and crop it to a new public file <img src="https://raw.githubusercontent.com/k3b/LosslessJpgCrop/master/app/src/debug/res/web/ic_menu_save.png" alt="save icon" height="30"/>
 * Workflow [#1](https://github.com/k3b/LosslessJpgCrop/issues/1) : From any **file manager** or **gallery app** that supports [intent-action-EDIT](https://developer.android.com/reference/android/content/Intent#ACTION_EDIT) for MIME *image/jpeg*:
-    * Crop current selected image to a new public file
+    * Crop current selected image to a new public file <img src="https://raw.githubusercontent.com/k3b/LosslessJpgCrop/master/app/src/debug/res/web/ic_menu_save.png" alt="save icon" height="30"/>
 * Workflow [#2](https://github.com/k3b/LosslessJpgCrop/issues/2) : From any app that supports [intent-action-SEND](https://developer.android.com/reference/android/content/Intent#ACTION_SEND) or [intent-action-SEND-TO](https://developer.android.com/reference/android/content/Intent#ACTION_SENDTO) for MIME *image/jpeg*
-    * Send/SendTo/Share a cropped version of the currently selected image 
+    * Send/SendTo/Share a cropped version of the currently selected image <img src="https://raw.githubusercontent.com/k3b/LosslessJpgCrop/master/app/src/debug/res/web/ic_menu_share.png" alt="share icon" height="30"/>
 * Workflow [#3](https://github.com/k3b/LosslessJpgCrop/issues/3)/[#8](https://github.com/k3b/LosslessJpgCrop/issues/8) : From any app that supports [intent-action-GET-CONTENT](https://developer.android.com/reference/android/content/Intent#ACTION_GET_CONTENT) or intent-action-PICK for MIME *image/jpeg*
     * Open/Pick the cropping of an uncropped image
-* Feature [#17](https://github.com/k3b/LosslessJpgCrop/issues/17)  (Since Version 1.2) : added support for image rotation
+* Feature [#17](https://github.com/k3b/LosslessJpgCrop/issues/17)  (Since Version 1.2) : added support for image rotation<img src="https://raw.githubusercontent.com/k3b/LosslessJpgCrop/master/app/src/debug/res/web/ic_menu_rotate.png" alt="rotate icon" height="30"/>
 * Feature [#35](https://github.com/k3b/LosslessJpgCrop/issues/35) (Since [Version 1.3](https://github.com/k3b/LosslessJpgCrop/milestone/5)) : Display current crop box coordinates and size
     * Show XY offset of top left corner of crop box displayed along with it's dimensions. 
-    * One can get more predictable results by sticking to 8 or 16 multiples for offset and box size allows to target aspect ratio.
-* Feature [#15](https://github.com/k3b/LosslessJpgCrop/issues/15) (Since [Version 1.3](https://github.com/k3b/LosslessJpgCrop/milestone/5))  : Define crop box size or aspect ratio
+    * You can get more predictable results by sticking to 8 or 16 multiples for offset and box size allows to target aspect ratio.
+* Feature [#15](https://github.com/k3b/LosslessJpgCrop/issues/15) (Since [Version 1.3](https://github.com/k3b/LosslessJpgCrop/milestone/5))  : Define crop box size or aspect ratio <img src="https://raw.githubusercontent.com/k3b/LosslessJpgCrop/master/app/src/debug/res/web/ic_menu_crop.png" alt="aspect ratio icon" height="30"/>
   * if you set width and height to a value below 100 then you define the aspect ratio of the cropping result. Example 9x13
   * if you set width and height to a value above 100 then you define the absolute size in pixel of the cropping result. Example 400x600
 
