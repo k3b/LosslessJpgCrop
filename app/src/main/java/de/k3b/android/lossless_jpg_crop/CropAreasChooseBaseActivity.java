@@ -23,6 +23,7 @@ import android.app.Activity;
 import android.content.ClipData;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -30,6 +31,7 @@ import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.provider.DocumentsContract;
 import android.util.Log;
 import android.view.Menu;
@@ -38,6 +40,7 @@ import android.view.SubMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.FileProvider;
 import androidx.exifinterface.media.ExifInterface;
@@ -52,7 +55,10 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import de.k3b.util.TempFileUtil;
@@ -64,12 +70,15 @@ import de.k3b.util.TempFileUtil;
  */
 abstract class CropAreasChooseBaseActivity extends BaseActivity implements DefineAspectRatioFragment.AspectRatioHandler {
     protected static final String TAG = "LLCrop";
-
-    private static final String STATE_CURRENT_CROP_AREA = "CURRENT_CROP_AREA";
-    private static final String STATE_CURRENT_ASPECT_RATIO = "KEY_ASPECT_RATIO";
-
     protected static final boolean LOAD_ASYNC = false;
     private static final boolean ENABLE_ASPECT_RATIO = true;
+
+    // keys for persisted states
+    private static final String KEY_CURRENT_CROP_AREA = "CURRENT_CROP_AREA";
+    private static final String KEY_CURRENT_ASPECT_RATIO = "CURRENT_ASPECT_RATIO";
+    private static final String KEY_ASPECT_RATIO_DEFINITIONS = "ASPECT_RATIO_DEFINITIONS";
+    public static final int MAX_COUNT_ASPECT_RATIO_DEFINITIONS = 15;
+
     private static final String ASPECT_RATIO_SQUARE = "8x8";
     public static final int SIZE_MIN = 40;
     public static final int SIZE_MAX = 99999;
@@ -90,12 +99,15 @@ abstract class CropAreasChooseBaseActivity extends BaseActivity implements Defin
     /** Same as last selected menu item text i.e. 9x13 */
     private String currentAspectRatioString = null;
 
+    private List<String> currentAspectRatioDefinitions = null;
+
     private int rotationBeforeCrop = 0;
     private int rotationAfterCrop = 0;
 
     // #7: workaround rotation change while picker is open causes Activity re-create without
     // uCropView recreation completed.
     private Rect mLastCropRect = null;
+
     protected CropAreasChooseBaseActivity(int idMenuMainMethod) {
         this.idMenuMainMethod = idMenuMainMethod;
         menu2Rotation = new HashMap<>();
@@ -318,7 +330,14 @@ abstract class CropAreasChooseBaseActivity extends BaseActivity implements Defin
         txtStatus = findViewById(R.id.status);
 
         if (savedInstanceState != null) {
-            currentAspectRatioString = savedInstanceState.getString(STATE_CURRENT_ASPECT_RATIO, currentAspectRatioString);
+            currentAspectRatioString = savedInstanceState.getString(KEY_CURRENT_ASPECT_RATIO, currentAspectRatioString);
+            final SharedPreferences prefs = PreferenceManager
+                    .getDefaultSharedPreferences(this.getApplicationContext());
+
+            String aspectRatioDefinitions = prefs.getString(KEY_ASPECT_RATIO_DEFINITIONS, null);
+            if (aspectRatioDefinitions != null) {
+                currentAspectRatioDefinitions = new ArrayList<String>(Arrays.asList(aspectRatioDefinitions.split(";")));
+            }
         }
         mSpectrum = new ImageProcessor();
 
@@ -330,48 +349,6 @@ abstract class CropAreasChooseBaseActivity extends BaseActivity implements Defin
         });
 
         setAspectRatio(currentAspectRatioString);
-    }
-
-    private void setAspectRatio(String aspectRatio) {
-        // allow "no aspect ratio" and "any size"
-        uCropView.setAspectRatio(SIZE_MIN, SIZE_MIN);
-        uCropView.setMaxCropResultSize(SIZE_MAX, SIZE_MAX);
-        uCropView.clearAspectRatio();
-
-        this.currentAspectRatioString = aspectRatio;
-        String[] xy = (aspectRatio == null) ? null : aspectRatio.split("x");
-
-        if (xy != null && xy.length >= 2) {
-            try {
-                int x = Integer.parseInt(xy[0]);
-                int y = Integer.parseInt(xy[1]);
-                if (x >= SIZE_ABSOLUTE_TRESHHOLD && y >= SIZE_ABSOLUTE_TRESHHOLD) {
-                    Rect cropRect = getCropRect();
-                    if (cropRect.width() != x || cropRect.height() != y) {
-                        mLastCropRect = new Rect(0, 0, x, y);
-
-                        uCropView.setCropRect(mLastCropRect);
-                    }
-
-                    // fixed AspectRatio, fixed size
-                    uCropView.setAspectRatio(x, y);
-                    uCropView.setMinCropResultSize(x,y);
-                    uCropView.setMaxCropResultSize(x,y);
-
-                } else {
-                    // fixed AspectRatio, any size
-                    uCropView.setAspectRatio(x, y);
-                    uCropView.setMinCropResultSize(SIZE_MIN,SIZE_MIN);
-                    uCropView.setMaxCropResultSize(SIZE_MAX, SIZE_MAX);
-                }
-
-            } catch (Exception ex) {
-                String message = "setAspectRatio('" + aspectRatio + "') . Valid example '7x13'";
-                Log.e(TAG, getInstanceNo4Debug() + message);
-            }
-        }
-        onUpdateCropping();
-        uCropView.invalidate();
     }
 
     private void onUpdateCropping() {
@@ -406,7 +383,7 @@ abstract class CropAreasChooseBaseActivity extends BaseActivity implements Defin
     protected void SetImageUriAndLastCropArea(Uri imageUri, Bundle savedInstanceState) {
         final Rect crop = (Rect) ((savedInstanceState == null)
                 ? null
-                : savedInstanceState.getParcelable(STATE_CURRENT_CROP_AREA));
+                : savedInstanceState.getParcelable(KEY_CURRENT_CROP_AREA));
 
         SetImageUriAndLastCropArea(imageUri, crop);
     }
@@ -512,9 +489,16 @@ abstract class CropAreasChooseBaseActivity extends BaseActivity implements Defin
 
         Rect crop = getCropRect();
         Log.d(TAG, getInstanceNo4Debug() + "onSaveInstanceState : crop=" + crop);
-        outState.putParcelable(STATE_CURRENT_CROP_AREA, crop);
-        outState.putString(STATE_CURRENT_ASPECT_RATIO, currentAspectRatioString);
+        outState.putParcelable(KEY_CURRENT_CROP_AREA, crop);
+        outState.putString(KEY_CURRENT_ASPECT_RATIO, currentAspectRatioString);
 
+        if (currentAspectRatioDefinitions != null) {
+            SharedPreferences.Editor edit = PreferenceManager
+                    .getDefaultSharedPreferences(this.getApplicationContext()).edit();
+
+            edit.putString(KEY_ASPECT_RATIO_DEFINITIONS, String.join(";", currentAspectRatioDefinitions));
+            edit.apply();
+        }
     }
 
     private void pickFromGallery(int requestId, int requestPermissionId) {
@@ -733,39 +717,9 @@ abstract class CropAreasChooseBaseActivity extends BaseActivity implements Defin
             }
         }
         if (ENABLE_ASPECT_RATIO) {
-            MenuItem menuAspectRatio = menu.findItem(R.id.menu_aspect_ratio);
-            if (menuAspectRatio != null) {
-                SubMenu menuCrop = menuAspectRatio.getSubMenu();
-                for (int i = menuCrop.size() - 1; i >= 0; i--) {
-                    MenuItem item = menuCrop.getItem(i);
-                    item.setCheckable(true);
-                    item.setChecked(isCurrentAspectRatio(item));
-                }
-            }
+            onPrepareMenuAspectRatio(menu);
         }
         return super.onPrepareOptionsMenu(menu);
-    }
-
-    /**
-     * @return true if Menu.NONE with ratio in title
-     */
-    private boolean isAspectRatio(MenuItem item) {
-        return item.getItemId() == Menu.NONE
-                && item.getTitle() != null;
-    }
-
-    /**
-     * @return true if item is the current selected ratio
-     */
-    private boolean isCurrentAspectRatio(MenuItem item) {
-        if (currentAspectRatioString == null) {
-            return item.getItemId() == R.id.menu_ratio_free;
-        } else if (currentAspectRatioString.equals(ASPECT_RATIO_SQUARE)) {
-            return item.getItemId() == R.id.menu_ratio_square;
-        } else {
-            return isAspectRatio(item)
-                    && currentAspectRatioString.equalsIgnoreCase(item.getTitle().toString());
-        }
     }
 
     @Override
@@ -795,13 +749,86 @@ abstract class CropAreasChooseBaseActivity extends BaseActivity implements Defin
             setAspectRatio(null);
             return true;
         } else if (menuItemId == R.id.menu_ratio_userdefined) {
-            return onRatioUserdefined((currentAspectRatioString == null) ? null : currentAspectRatioString.split("x"));
+            return onAspectRatioUserdefined((currentAspectRatioString == null) ? null : currentAspectRatioString.split("x"));
         } else {
             return super.onOptionsItemSelected(item);
         }
     }
 
-    private boolean onRatioUserdefined(String[] paramXY) {
+    //----------------------
+
+    private void onPrepareMenuAspectRatio(Menu menu) {
+        SubMenu menuAspectRatio = getSubMenuAspectRatio(menu);
+        if (menuAspectRatio != null) {
+            if (currentAspectRatioDefinitions == null) {
+                currentAspectRatioDefinitions = getRatios(menuAspectRatio);
+            } else {
+                redefineMenuRatio(menuAspectRatio, currentAspectRatioDefinitions);
+            }
+
+            checkCurrentRatio(menuAspectRatio);
+        }
+    }
+
+    private void redefineMenuRatio(SubMenu menuAspectRatio, List<String> currentAspectRatioDefinitions) {
+        menuAspectRatio.removeGroup(R.id.menu_group_ratio_userdefined);
+        for (String title : currentAspectRatioDefinitions) {
+            menuAspectRatio.add(R.id.menu_group_ratio_userdefined, Menu.NONE, 100, title);
+        }
+    }
+
+    private void checkCurrentRatio(SubMenu menuAspectRatio) {
+        for (int i = menuAspectRatio.size() - 1; i >= 0; i--) {
+            MenuItem item = menuAspectRatio.getItem(i);
+            item.setCheckable(true);
+            item.setChecked(isCurrentAspectRatio(item));
+        }
+    }
+
+
+    @NonNull
+    private List<String> getRatios(SubMenu menuAspectRatio) {
+        List<String> items = new ArrayList<>();
+        for (int i = 0; i < menuAspectRatio.size() ; i++) {
+            MenuItem item = menuAspectRatio.getItem(i);
+            if (isAspectRatio(item)) {
+                items.add(item.getTitle().toString());
+            }
+        }
+        return items;
+    }
+
+    private SubMenu getSubMenuAspectRatio(Menu menu) {
+        MenuItem menuAspectRatio = menu.findItem(R.id.menu_aspect_ratio);
+        if (menuAspectRatio != null) {
+            return menuAspectRatio.getSubMenu();
+        }
+        return null;
+    }
+
+    /**
+     * @return true if Menu.NONE with ratio in title
+     */
+    private boolean isAspectRatio(MenuItem item) {
+        return item.getItemId() == Menu.NONE
+                && item.getTitle() != null;
+    }
+
+    /**
+     * @return true if item is the current selected ratio
+     */
+    private boolean isCurrentAspectRatio(MenuItem item) {
+        if (currentAspectRatioString == null) {
+            return item.getItemId() == R.id.menu_ratio_free;
+        } else if (currentAspectRatioString.equals(ASPECT_RATIO_SQUARE)) {
+            return item.getItemId() == R.id.menu_ratio_square;
+        } else {
+            return isAspectRatio(item)
+                    && currentAspectRatioString.equalsIgnoreCase(item.getTitle().toString());
+        }
+    }
+
+    private boolean onAspectRatioUserdefined(String[] paramXY) {
         String x,y;
         if (paramXY != null && paramXY.length > 1) {
             x = paramXY[0];
@@ -823,4 +850,61 @@ abstract class CropAreasChooseBaseActivity extends BaseActivity implements Defin
         setAspectRatio(width + "x" + height);
     }
 
+    private void setAspectRatio(String aspectRatio) {
+        // allow "no aspect ratio" and "any size"
+        uCropView.setAspectRatio(SIZE_MIN, SIZE_MIN);
+        uCropView.setMaxCropResultSize(SIZE_MAX, SIZE_MAX);
+        uCropView.clearAspectRatio();
+
+        this.currentAspectRatioString = aspectRatio;
+        String[] xy = (aspectRatio == null) ? null : aspectRatio.split("x");
+
+        if (xy != null && xy.length >= 2) {
+            try {
+                int x = Integer.parseInt(xy[0]);
+                int y = Integer.parseInt(xy[1]);
+                if (x >= SIZE_ABSOLUTE_TRESHHOLD && y >= SIZE_ABSOLUTE_TRESHHOLD) {
+                    Rect cropRect = getCropRect();
+                    if (cropRect.width() != x || cropRect.height() != y) {
+                        mLastCropRect = new Rect(0, 0, x, y);
+
+                        uCropView.setCropRect(mLastCropRect);
+                    }
+
+                    // fixed AspectRatio, fixed size
+                    uCropView.setAspectRatio(x, y);
+                    uCropView.setMinCropResultSize(x,y);
+                    uCropView.setMaxCropResultSize(x,y);
+
+                } else {
+                    // fixed AspectRatio, any size
+                    uCropView.setAspectRatio(x, y);
+                    uCropView.setMinCropResultSize(SIZE_MIN,SIZE_MIN);
+                    uCropView.setMaxCropResultSize(SIZE_MAX, SIZE_MAX);
+                }
+
+                // uCropView.on
+            } catch (Exception ex) {
+                String message = "setAspectRatio('" + aspectRatio + "') . Valid example '7x13'";
+                Log.e(TAG, getInstanceNo4Debug() + message);
+            }
+        }
+        onUpdateCropping();
+        uCropView.invalidate();
+
+        if (currentAspectRatioDefinitions != null && !ASPECT_RATIO_SQUARE.equals(aspectRatio)) {
+            int found = currentAspectRatioDefinitions.indexOf(aspectRatio);
+            if (found >= 0) currentAspectRatioDefinitions.remove(found);
+
+            while (currentAspectRatioDefinitions.size() > MAX_COUNT_ASPECT_RATIO_DEFINITIONS) {
+                currentAspectRatioDefinitions.remove(currentAspectRatioDefinitions.size() - 1);
+            }
+            currentAspectRatioDefinitions.add(0, aspectRatio);
+        }
+    }
+/*
+    !!!TODO use GetPrivateProfileString instead of instance bundle
+    docu: mutating menu
+
+ */
 }

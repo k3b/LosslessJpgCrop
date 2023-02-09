@@ -3,16 +3,15 @@
     xmlns:android="http://schemas.android.com/apk/res/android" >
 
     <item android:id="@+id/menu_save"
-
         android:showAsAction="always"
         android:icon="@android:drawable/ic_menu_save"
-        android:title="@android:string/ok"
+        android:title="@string/label_save_as"
         android:orderInCategory="10"
         tools:ignore="AppCompatResource" />
 
-
     <item android:id="@+id/menu_send"
-        android:showAsAction="never"
+        android:showAsAction="ifRoom"
+        android:icon="@android:drawable/ic_menu_send"
         android:title="@string/label_send"
         android:orderInCategory="100"
         tools:ignore="AppCompatResource" />

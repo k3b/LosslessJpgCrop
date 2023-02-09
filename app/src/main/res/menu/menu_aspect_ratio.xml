@@ -46,12 +46,14 @@ this program. If not, see <http://www.gnu.org/licenses/>
                     android:checkable="true"
                     tools:ignore="AppCompatResource" />
                 <!-- these are the last used "user defined values" that have no id -->
+            <group android:id="@+id/menu_group_ratio_userdefined" >
                 <item android:title="9x11"  />
                 <item android:title="9x13" />
                 <item android:title="9x15" />
                 <item android:title="10x13" />
                 <item android:title="10x15" />
                 <item android:title="13x18" />
+            </group>
 <!--
             /*
             Format 3:4:
