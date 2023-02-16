@@ -329,8 +329,7 @@ abstract class CropAreasChooseBaseActivity extends BaseActivity implements Defin
         uCropView = findViewById(R.id.ucrop);
         txtStatus = findViewById(R.id.status);
 
-        if (savedInstanceState != null) {
-            currentAspectRatioString = savedInstanceState.getString(KEY_CURRENT_ASPECT_RATIO, currentAspectRatioString);
+        if (currentAspectRatioDefinitions == null) {
             final SharedPreferences prefs = PreferenceManager
                     .getDefaultSharedPreferences(this.getApplicationContext());
 
@@ -338,6 +337,10 @@ abstract class CropAreasChooseBaseActivity extends BaseActivity implements Defin
             if (aspectRatioDefinitions != null) {
                 currentAspectRatioDefinitions = new ArrayList<String>(Arrays.asList(aspectRatioDefinitions.split(";")));
             }
+        }
+
+        if (savedInstanceState != null) {
+            currentAspectRatioString = savedInstanceState.getString(KEY_CURRENT_ASPECT_RATIO, currentAspectRatioString);
         }
         mSpectrum = new ImageProcessor();
 
@@ -491,14 +494,6 @@ abstract class CropAreasChooseBaseActivity extends BaseActivity implements Defin
         Log.d(TAG, getInstanceNo4Debug() + "onSaveInstanceState : crop=" + crop);
         outState.putParcelable(KEY_CURRENT_CROP_AREA, crop);
         outState.putString(KEY_CURRENT_ASPECT_RATIO, currentAspectRatioString);
-
-        if (currentAspectRatioDefinitions != null) {
-            SharedPreferences.Editor edit = PreferenceManager
-                    .getDefaultSharedPreferences(this.getApplicationContext()).edit();
-
-            edit.putString(KEY_ASPECT_RATIO_DEFINITIONS, String.join(";", currentAspectRatioDefinitions));
-            edit.apply();
-        }
     }
 
     private void pickFromGallery(int requestId, int requestPermissionId) {
@@ -892,19 +887,28 @@ abstract class CropAreasChooseBaseActivity extends BaseActivity implements Defin
         onUpdateCropping();
         uCropView.invalidate();
 
-        if (currentAspectRatioDefinitions != null && !ASPECT_RATIO_SQUARE.equals(aspectRatio)) {
-            int found = currentAspectRatioDefinitions.indexOf(aspectRatio);
-            if (found >= 0) currentAspectRatioDefinitions.remove(found);
-
-            while (currentAspectRatioDefinitions.size() > MAX_COUNT_ASPECT_RATIO_DEFINITIONS) {
-                currentAspectRatioDefinitions.remove(currentAspectRatioDefinitions.size() - 1);
-            }
-            currentAspectRatioDefinitions.add(0, aspectRatio);
-        }
+        redefineAspectMenu(currentAspectRatioDefinitions, aspectRatio);
     }
-/*
-    !!!TODO use GetPrivateProfileString instead of instance bundle
-    docu: mutating menu
 
- */
+    private void redefineAspectMenu(List<String> currentAspectRatioDefinitions, String aspectRatio) {
+        if (this.currentAspectRatioDefinitions != null
+                && aspectRatio != null
+                && !ASPECT_RATIO_SQUARE.equals(aspectRatio)) {
+            int found = this.currentAspectRatioDefinitions.indexOf(aspectRatio);
+            if (found >= 0) this.currentAspectRatioDefinitions.remove(found);
+
+            while (this.currentAspectRatioDefinitions.size() > MAX_COUNT_ASPECT_RATIO_DEFINITIONS) {
+                this.currentAspectRatioDefinitions.remove(this.currentAspectRatioDefinitions.size() - 1);
+            }
+            this.currentAspectRatioDefinitions.add(0, aspectRatio);
+        }
+        if (currentAspectRatioDefinitions != null) {
+            SharedPreferences.Editor edit = PreferenceManager
+                    .getDefaultSharedPreferences(this.getApplicationContext()).edit();
+
+            edit.putString(KEY_ASPECT_RATIO_DEFINITIONS, String.join(";", currentAspectRatioDefinitions));
+            edit.apply();
+        }
+
+    }
 }
