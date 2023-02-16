@@ -7,7 +7,3 @@
   * v menu to define free/square/predefined/userdefined
   * bugs
 >   * 200x400 => swap =>  377x188 (expected 400x200)
-v   * v 200x400 => free => free not working
-  * todo 
-    * add userdefined to menu
-v   * readme.md += aspectratio
