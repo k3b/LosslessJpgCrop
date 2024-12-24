@@ -2,13 +2,11 @@ apply plugin: 'com.android.library'
 
 android {
 
-    compileSdkVersion rootProject.compileSdkVersion
+    compileSdk 34
 
     defaultConfig {
-        minSdkVersion 15
-        targetSdkVersion rootProject.compileSdkVersion
-        versionCode 1
-        versionName PUBLISH_VERSION
+        minSdk 15
+        targetSdk 36
     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8

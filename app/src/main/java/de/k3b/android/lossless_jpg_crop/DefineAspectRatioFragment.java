@@ -98,30 +98,20 @@ public class DefineAspectRatioFragment extends DialogFragment {
         outState.putString(PARAM_HEIGHT, mParamHeight);
     }
 
-    /** handle init for dialog-only controlls: cmdOk, cmdCancel, status */
+    /** handle init for dialog-only controlls: cmdOk, cmdCancel, status
+     * @noinspection SuspiciousNameCombination*/
     private void onCreateViewDialog(View view) {
-        view.<Button>findViewById(R.id.cmd_ok).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onOk();
-                dismiss();
-            }
+        view.<Button>findViewById(R.id.cmd_ok).setOnClickListener(v -> {
+            onOk();
+            dismiss();
         });
-        view.<Button>findViewById(R.id.cmd_cancel).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dismiss();
-            }
-        });
-        view.<Button>findViewById(R.id.cmd_swap).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                saveDialog();
-                String temp = mParamHeight;
-                mParamHeight = mParamWidth;
-                mParamWidth = temp;
-                loadDialog();
-            }
+        view.<Button>findViewById(R.id.cmd_cancel).setOnClickListener(v -> dismiss());
+        view.<Button>findViewById(R.id.cmd_swap).setOnClickListener(v -> {
+            saveDialog();
+            String temp = mParamHeight;
+            mParamHeight = mParamWidth;
+            mParamWidth = temp;
+            loadDialog();
         });
 
         editWidth = view.findViewById(R.id.editWidth);

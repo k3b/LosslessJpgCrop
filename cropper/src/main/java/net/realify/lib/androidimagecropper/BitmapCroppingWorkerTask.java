@@ -217,10 +217,8 @@ final class BitmapCroppingWorkerTask
         } else {
           BitmapUtils.writeBitmapToUri(
               mContext, bitmap, mSaveUri, mSaveCompressFormat, mSaveCompressQuality);
-          if (bitmap != null) {
             bitmap.recycle();
-          }
-          return new Result(mSaveUri, bitmapSampled.sampleSize);
+            return new Result(mSaveUri, bitmapSampled.sampleSize);
         }
       }
       return null;

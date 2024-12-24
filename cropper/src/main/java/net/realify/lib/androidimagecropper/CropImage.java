@@ -18,7 +18,6 @@ import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.graphics.Bitmap;
@@ -37,7 +36,6 @@ import android.provider.MediaStore;
 import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
 
 import java.io.File;
@@ -46,10 +44,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Helper to simplify crop image work like starting pick-image acitvity and handling camera/gallery
+ * Helper to simplify crop image work like starting pick-image activity and handling camera/gallery
  * intents.<br>
  * The goal of the helper is to simplify the starting and most-common usage of image cropping and
- * not all porpose all possible scenario one-to-rule-them-all code base. So feel free to use it as
+ * not all purpose all possible scenario one-to-rule-them-all code base. So feel free to use it as
  * is and as a wiki to make your own.<br>
  * Added value you get out-of-the-box is some edge case handling that you may miss otherwise, like
  * the stupid-ass Android camera result URI that may differ from version to version and from device
@@ -126,7 +124,7 @@ public final class CropImage {
 
   /**
    * Start an activity to get image for cropping using chooser intent that will have all the
-   * available applications for the device like camera (MyCamera), galery (Photos), store apps
+   * available applications for the device like camera (MyCamera), gallery (Photos), store apps
    * (Dropbox), etc.<br>
    * Use "pick_image_intent_chooser_title" string resource to override pick chooser title.
    *
@@ -190,7 +188,7 @@ public final class CropImage {
 
     List<Intent> galleryIntents =
         getGalleryIntents(packageManager, Intent.ACTION_GET_CONTENT, includeDocuments);
-    if (galleryIntents.size() == 0) {
+    if (galleryIntents.isEmpty()) {
       // if no intents found for get-content try pick intent action (Huawei P9).
       galleryIntents = getGalleryIntents(packageManager, Intent.ACTION_PICK, includeDocuments);
     }
@@ -293,8 +291,8 @@ public final class CropImage {
   }
 
   /**
-   * Check if explicetly requesting camera permission is required.<br>
-   * It is required in Android Marshmellow and above if "CAMERA" permission is requested in the
+   * Check if explicitly requesting camera permission is required.<br>
+   * It is required in Android Marshmallow and above if "CAMERA" permission is requested in the
    * manifest.<br>
    * See <a
    * href="http://stackoverflow.com/questions/32789027/android-m-camera-intent-permission-bug">StackOverflow
@@ -315,13 +313,10 @@ public final class CropImage {
    */
   public static boolean hasPermissionInManifest(
       @NonNull Context context, @NonNull String permissionName) {
-    String packageName = context.getPackageName();
-    try {
-      PackageInfo packageInfo =
-          context.getPackageManager().getPackageInfo(packageName, PackageManager.GET_PERMISSIONS);
-      final String[] declaredPermisisons = packageInfo.requestedPermissions;
-      if (declaredPermisisons != null && declaredPermisisons.length > 0) {
-        for (String p : declaredPermisisons) {
+      try {
+          final String[] declaredPermissions = context.getPackageManager().getPackageInfo(context.getPackageName(), PackageManager.GET_PERMISSIONS).requestedPermissions;
+      if (declaredPermissions != null) {
+        for (String p : declaredPermissions) {
           if (p.equalsIgnoreCase(permissionName)) {
             return true;
           }
@@ -467,13 +462,10 @@ public final class CropImage {
     public Intent getIntent(@NonNull Context context, @Nullable Class<?> cls) {
       mOptions.validate();
 
-      Intent intent = new Intent();
-      intent.setClass(context, cls);
       Bundle bundle = new Bundle();
       bundle.putParcelable(CROP_IMAGE_EXTRA_SOURCE, mSource);
       bundle.putParcelable(CROP_IMAGE_EXTRA_OPTIONS, mOptions);
-      intent.putExtra(CropImage.CROP_IMAGE_EXTRA_BUNDLE, bundle);
-      return intent;
+      return new Intent().setClass(context, cls).putExtra(CropImage.CROP_IMAGE_EXTRA_BUNDLE, bundle);
     }
 
     /**
@@ -510,7 +502,6 @@ public final class CropImage {
      *
      * @param fragment fragment to receive result
      */
-    @RequiresApi(api = Build.VERSION_CODES.HONEYCOMB)
     public void start(@NonNull Context context, @NonNull android.app.Fragment fragment) {
       fragment.startActivityForResult(getIntent(context), CROP_IMAGE_ACTIVITY_REQUEST_CODE);
     }
@@ -530,7 +521,6 @@ public final class CropImage {
      *
      * @param fragment fragment to receive result
      */
-    @RequiresApi(api = Build.VERSION_CODES.HONEYCOMB)
     public void start(
         @NonNull Context context, @NonNull android.app.Fragment fragment, @Nullable Class<?> cls) {
       fragment.startActivityForResult(getIntent(context, cls), CROP_IMAGE_ACTIVITY_REQUEST_CODE);
@@ -560,7 +550,7 @@ public final class CropImage {
     /**
      * The radius of the touchable area around the handle (in pixels).<br>
      * We are basing this value off of the recommended 48dp Rhythm.<br>
-     * See: http://developer.android.com/design/style/metrics-grids.html#48dp-rhythm<br>
+     * See: <a href="http://developer.android.com/design/style/metrics-grids.html#48dp-rhythm">...</a><br>
      * <i>Default: 48dp</i>
      */
     public ActivityBuilder setTouchRadius(float touchRadius) {
@@ -799,7 +789,7 @@ public final class CropImage {
     }
 
     /**
-     * the compression format to use when writting the image.<br>
+     * the compression format to use when writing the image.<br>
      * <i>Default: JPEG</i>
      */
     public ActivityBuilder setOutputCompressFormat(Bitmap.CompressFormat outputCompressFormat) {
@@ -808,7 +798,7 @@ public final class CropImage {
     }
 
     /**
-     * the quility (if applicable) to use when writting the image (0 - 100).<br>
+     * the quality (if applicable) to use when writing the image (0 - 100).<br>
      * <i>Default: 90</i>
      */
     public ActivityBuilder setOutputCompressQuality(int outputCompressQuality) {
@@ -896,7 +886,7 @@ public final class CropImage {
     }
 
     /**
-     * The amount of degreees to rotate clockwise or counter-clockwise (0-360).<br>
+     * The amount of degrees to rotate clockwise or counter-clockwise (0-360).<br>
      * <i>Default: 90</i>
      */
     public ActivityBuilder setRotationDegrees(int rotationDegrees) {
@@ -985,13 +975,13 @@ public final class CropImage {
     protected ActivityResult(Parcel in) {
       super(
           null,
-          (Uri) in.readParcelable(Uri.class.getClassLoader()),
+              in.readParcelable(Uri.class.getClassLoader()),
           null,
-          (Uri) in.readParcelable(Uri.class.getClassLoader()),
+              in.readParcelable(Uri.class.getClassLoader()),
           (Exception) in.readSerializable(),
           in.createFloatArray(),
-          (Rect) in.readParcelable(Rect.class.getClassLoader()),
-          (Rect) in.readParcelable(Rect.class.getClassLoader()),
+              in.readParcelable(Rect.class.getClassLoader()),
+              in.readParcelable(Rect.class.getClassLoader()),
           in.readInt(),
           in.readInt());
     }

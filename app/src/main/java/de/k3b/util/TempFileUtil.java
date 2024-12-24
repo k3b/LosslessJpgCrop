@@ -13,15 +13,14 @@ public class TempFileUtil {
      * */
     public static void removeOldTempFiles(File dir, long nowInMilliSecs) {
         for (File candidate : dir.listFiles()) {
-            if (candidate.isFile() &&  shouldDeleteTempFile(candidate, nowInMilliSecs)) {
+            if (candidate.isFile() && shouldDeleteTempFile(candidate, nowInMilliSecs)) {
                 candidate.delete();
             }
         }
     }
 
     private static boolean shouldDeleteTempFile(File candidate, long nowInMilliSecs) {
-        if (candidate == null) return false;
-        return shouldDeleteTempFile(candidate.getName(), candidate.lastModified(), nowInMilliSecs);
+        return (candidate != null) && shouldDeleteTempFile(candidate.getName(), candidate.lastModified(), nowInMilliSecs);
         //
     }
 
@@ -42,6 +41,4 @@ public class TempFileUtil {
         }
         return originalFileName;
     }
-
-
 }

@@ -8,6 +8,7 @@
         android:layout_height="match_parent"
         android:adjustViewBounds="true"
         android:scaleType="centerInside"
+        android:background="@android:color/black"
         tools:ignore="contentDescription"/>
 
     <net.realify.lib.androidimagecropper.CropOverlayView
@@ -21,5 +22,4 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"/>
-
 </merge>

@@ -47,4 +47,5 @@ this program. If not, see <http://www.gnu.org/licenses/>
     <string name="permission_error">Missing permisions</string>
 
     <string name="label_define_aspect_ratio">Define Aspect Ratio</string>
+    <string name="remove_exif" translatable="false">🗑️ Remove EXIF %s</string>
 </resources>

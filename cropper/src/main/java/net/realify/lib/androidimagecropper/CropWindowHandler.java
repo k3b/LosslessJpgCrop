@@ -14,7 +14,7 @@ package net.realify.lib.androidimagecropper;
 
 import android.graphics.RectF;
 
-/** Handler from crop window stuff, moving and knowing possition. */
+/** Handler from crop window stuff, moving and knowing position. */
 final class CropWindowHandler {
 
   // region: Fields and Consts
@@ -97,12 +97,12 @@ final class CropWindowHandler {
     return Math.min(mMaxCropWindowHeight, mMaxCropResultHeight / mScaleFactorHeight);
   }
 
-  /** get the scale factor (on width) of the showen image to original image. */
+  /** get the scale factor (on width) of the shown image to original image. */
   public float getScaleFactorWidth() {
     return mScaleFactorWidth;
   }
 
-  /** get the scale factor (on height) of the showen image to original image. */
+  /** get the scale factor (on height) of the shown image to original image. */
   public float getScaleFactorHeight() {
     return mScaleFactorHeight;
   }
@@ -126,7 +126,7 @@ final class CropWindowHandler {
   }
 
   /**
-   * set the max width/height and scale factor of the showen image to original image to scale the
+   * set the max width/height and scale factor of the shown image to original image to scale the
    * limits appropriately.
    */
   public void setCropWindowLimits(

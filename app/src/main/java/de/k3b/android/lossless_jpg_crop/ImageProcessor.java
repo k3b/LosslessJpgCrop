@@ -19,8 +19,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+
 public class ImageProcessor {
-    private Spectrum mSpectrum;
+    private final Spectrum mSpectrum;
 
     public static void init(Context context) {
         SpectrumSoLoader.init(context);
@@ -34,7 +35,7 @@ public class ImageProcessor {
         // DefaultPlugins.get()); // JPEG, PNG and WebP plugins
     }
 
-    public void crop(InputStream inputStream, OutputStream outputStream, Rect rect, int relativeRotationInDegrees)  throws IOException {
+    public void crop(InputStream inputStream, OutputStream outputStream, Rect rect, int relativeRotationInDegrees) throws IOException {
         crop(inputStream, outputStream, rect.left, rect.top, rect.right, rect.bottom, relativeRotationInDegrees);
     }
 

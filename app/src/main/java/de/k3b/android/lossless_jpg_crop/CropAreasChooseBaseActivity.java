@@ -18,7 +18,8 @@ this program. If not, see <http://www.gnu.org/licenses/>
  */
 package de.k3b.android.lossless_jpg_crop;
 
-import android.Manifest;
+import static android.content.Intent.FLAG_GRANT_WRITE_URI_PERMISSION;
+
 import android.app.Activity;
 import android.content.ClipData;
 import android.content.Context;
@@ -31,6 +32,7 @@ import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.provider.DocumentsContract;
 import android.util.Log;
@@ -41,9 +43,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.core.app.ActivityCompat;
 import androidx.core.content.FileProvider;
 import androidx.exifinterface.media.ExifInterface;
+
+import com.tomg.exifinterfaceextended.ExifInterfaceExtended;
 
 import net.realify.lib.androidimagecropper.CropImageView;
 
@@ -54,13 +57,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import de.k3b.util.FileUtils;
 import de.k3b.util.TempFileUtil;
 
 /**
@@ -153,14 +157,14 @@ abstract class CropAreasChooseBaseActivity extends BaseActivity implements Defin
         }
 
         protected boolean saveAsPublicCroppedImage() {
-            if (ActivityCompat.checkSelfPermission(getBaseContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                    != PackageManager.PERMISSION_GRANTED) {
-                requestPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                        getString(R.string.permission_write_storage_rationale),
-                        Edit.REQUEST_SAVE_EDIT_PICTURE_PERMISSION);
-            } else {
+//            if (ActivityCompat.checkSelfPermission(getBaseContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE)
+//                    != PackageManager.PERMISSION_GRANTED) {
+//                requestPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE,
+//                        getString(R.string.permission_write_storage_rationale),
+//                        Edit.REQUEST_SAVE_EDIT_PICTURE_PERMISSION);
+//            } else
                 edit.openPublicOutputUriPicker(Edit.REQUEST_SAVE_EDIT_PICTURE_AS);
-            }
+
             return true;
         }
 
@@ -168,26 +172,37 @@ abstract class CropAreasChooseBaseActivity extends BaseActivity implements Defin
             String proposedFileName = createCropFileName();
             // String proposedOutPath = inUri.getP new Uri() replaceExtension(originalFileName, "_llcrop.jpg");
 
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
+                Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT)
+                        .setType(IMAGE_JPEG_MIME)
+                        .addCategory(Intent.CATEGORY_OPENABLE)
+                        .putExtra(Intent.EXTRA_TITLE, proposedFileName)
+                        .setFlags(FLAG_GRANT_WRITE_URI_PERMISSION
+                                | Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION);
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+                    intent.putExtra(DocumentsContract.EXTRA_PROMPT, getString(R.string.label_save_as));
+                }
+                Log.d(TAG, getInstanceNo4Debug() + "openPublicOutputUriPicker '" + proposedFileName + "'");
 
-            // DocumentsContract#EXTRA_INITIAL_URI
-            Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT)
-                    .setType(IMAGE_JPEG_MIME)
-                    .addCategory(Intent.CATEGORY_OPENABLE)
-                    .putExtra(Intent.EXTRA_TITLE, proposedFileName)
-                    .setFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION
-                            | Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION);
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
-                intent.putExtra(DocumentsContract.EXTRA_PROMPT, getString(R.string.label_save_as));
+                startActivityForResult(intent, folderpickerCode);
+            } else {
+                File parent = new File(Environment.getExternalStorageDirectory(), Environment.DIRECTORY_PICTURES);
+                parent.mkdir();
+                File file = new File(parent, proposedFileName);
+                try(OutputStream os = new FileOutputStream(file)) {
+                    edit.saveEditPictureToOutputStream(os);
+                    Toast.makeText(getBaseContext(),
+                            getString(R.string.toast_saved_as, Environment.DIRECTORY_PICTURES + '/' + file.getName()),
+                            Toast.LENGTH_LONG).show();
+                } catch (Exception e) {
+                    Log.e(TAG, e.getMessage());
+                }
             }
-
-            Log.d(TAG, getInstanceNo4Debug() + "openPublicOutputUriPicker '" + proposedFileName + "'");
-
-            startActivityForResult(intent, folderpickerCode);
             return true;
         }
         protected void onGetEditPictureResult(int resultCode, Intent data) {
             if (resultCode == RESULT_OK) {
-                final Uri selectedUri = (data == null) ? null : getSourceImageUri(data);
+                final Uri selectedUri = (data == null) ? null : (data.getData());
                 if (selectedUri != null) {
                     Log.d(TAG, getInstanceNo4Debug() + "Restarting with uri '" + selectedUri + "'");
 
@@ -203,7 +218,8 @@ abstract class CropAreasChooseBaseActivity extends BaseActivity implements Defin
             Toast.makeText(getBaseContext(), R.string.toast_cannot_retrieve_selected_image, Toast.LENGTH_SHORT).show();
             finishIfMainMethod(R.id.menu_save);
         }
-        protected void onSaveEditPictureAsOutputUriPickerResult(Uri outUri) {
+
+        protected void saveEditPictureToOutputStream(OutputStream outStream) {
 
             // use to provoke an error to test error handling
             // Uri outUri = Uri.parse(outUri + "-err");
@@ -212,44 +228,85 @@ abstract class CropAreasChooseBaseActivity extends BaseActivity implements Defin
 
             if (inUri != null) {
                 Rect rect = getCropRect();
-                InputStream inStream = null;
-                OutputStream outStream = null;
+//                final String context_message = getInstanceNo4Debug() + "Cropping '" + inUri + "'(" + rect + ") => '"
+//                        + outUri + "' ('" + asString(outUri) + "')";
+//                Log.i(TAG, context_message);
+                try (InputStream inStream = getContentResolver().openInputStream(inUri)) {
+                    if(PreferenceManager
+                            .getDefaultSharedPreferences(getApplicationContext())
+                            .getBoolean("remove-exif", false)) {
+                        File tempImg = new File(getCacheDir(), "t.jpg");
+                        try(OutputStream temp = new FileOutputStream(tempImg)) {
+                            crop(inStream, temp, rect);
+                            try(InputStream is = FileUtils.getInputStream(tempImg)) {
+                                new ExifInterfaceExtended(tempImg).saveExclusive(is, outStream, true);
+                            }
+                            tempImg.delete();
+                        }
+                    } else crop(inStream, outStream, rect);
 
-                final String context_message = getInstanceNo4Debug() + "Cropping '" + inUri + "'(" + rect + ") => '"
-                        + outUri + "' ('" + asString(outUri) + "')";
-                Log.i(TAG, context_message);
-
-                try {
-                    inStream = getContentResolver().openInputStream(inUri);
-                    outStream = getContentResolver().openOutputStream(outUri, "w");
-                    crop(inStream, outStream, rect);
-
-                    String message = getString(R.string.toast_saved_as,
-                            asString(outUri));
-                    Toast.makeText(getBaseContext(), message, Toast.LENGTH_SHORT).show();
+//                    String message = getString(R.string.toast_saved_as,
+//                            asString(outUri));
+//                    Toast.makeText(getBaseContext(), message, Toast.LENGTH_SHORT).show();
 
                     finishIfMainMethod(R.id.menu_save);
-                    return;
                 } catch (Exception e) {
                     close(outStream, outStream);
 
-                    Log.e(TAG, "Error " + context_message + e.getMessage(), e);
+                    // Log.e(TAG, "Error " + context_message + e.getMessage(), e);
 
-                    try {
+//                    Log.e(TAG, "Error " + context_message + "(" + outUri +") => " + e.getMessage(), e);
+                    Toast.makeText(getBaseContext(),
+                            //getString(R.string.toast_saved_error, asString(outUri),
+                            e.getMessage()
+                            // )
+                            ,
+                            Toast.LENGTH_LONG).show();
+                } finally {
+                    close(outStream, outStream);
+                }
+            } else {
+                // outUri==null or error
+                Log.i(TAG, getInstanceNo4Debug() + "onOpenPublicOutputUriPickerResult(null): No output url, not saved.");
+            }
+        }
+
+        protected void onSaveEditPictureAsOutputUriPickerResult(Uri outUri) {
+
+            // use to provoke an error to test error handling
+            // Uri outUri = Uri.parse(outUri + "-err");
+
+            final Uri inUri = getSourceImageUri(getIntent());
+
+            if (inUri != null) {
+//                final String context_message = getInstanceNo4Debug() + "Cropping '" + inUri + "'(" + rect + ") => '"
+//                        + outUri + "' ('" + asString(outUri) + "')";
+//                Log.i(TAG, context_message);
+
+                try (OutputStream outStream = getContentResolver().openOutputStream(outUri)) {
+                    saveEditPictureToOutputStream(outStream);
+//                    String message = getString(R.string.toast_saved_as,
+//                            asString(outUri));
+//                    Toast.makeText(getBaseContext(), message, Toast.LENGTH_SHORT).show();
+
+                    finishIfMainMethod(R.id.menu_save);
+                } catch (Exception e) {
+                   // Log.e(TAG, "Error " + context_message + e.getMessage(), e);
+
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) try {
                         // #14: delete affected file as it is useless
                         DocumentsContract.deleteDocument(getContentResolver(), outUri);
                     } catch (Exception exDelete) {
                         // ignore if useless file cannot be deleted
                     }
-
-                    Log.e(TAG, "Error " + context_message + "(" + outUri +") => " + e.getMessage(), e);
+//                    Log.e(TAG, "Error " + context_message + "(" + outUri +") => " + e.getMessage(), e);
                     Toast.makeText(getBaseContext(),
-                            getString(R.string.toast_saved_error, asString(outUri), e.getMessage()),
+                            //getString(R.string.toast_saved_error, asString(outUri),
+                                    e.getMessage()
+                           // )
+                            ,
                             Toast.LENGTH_LONG).show();
 
-                } finally {
-                    close(outStream, outStream);
-                    close(inStream, inStream);
                 }
             } else {
                 // outUri==null or error
@@ -268,7 +325,7 @@ abstract class CropAreasChooseBaseActivity extends BaseActivity implements Defin
             Uri outUri = cropToSharedUri();
 
             if (outUri != null) {
-                boolean isSend = isSendAction();
+                boolean isSend = true;//isSendAction(); ???
 
                 Intent childSend = new Intent();
 
@@ -307,7 +364,7 @@ abstract class CropAreasChooseBaseActivity extends BaseActivity implements Defin
         private boolean isSendAction() {
             Intent i = getIntent();
             String action = (i != null) ? i.getAction() : null;
-            return (action != null) && Intent.ACTION_SEND.equalsIgnoreCase(action);
+            return Intent.ACTION_SEND.equalsIgnoreCase(action);
         }
 
         private void copyExtra(Intent outIntent, Bundle extras, String... extraIds) {
@@ -335,7 +392,7 @@ abstract class CropAreasChooseBaseActivity extends BaseActivity implements Defin
 
             String aspectRatioDefinitions = prefs.getString(KEY_ASPECT_RATIO_DEFINITIONS, null);
             if (aspectRatioDefinitions != null) {
-                currentAspectRatioDefinitions = new ArrayList<String>(Arrays.asList(aspectRatioDefinitions.split(";")));
+                currentAspectRatioDefinitions = new ArrayList<>(Arrays.asList(aspectRatioDefinitions.split(";")));
             }
         }
 
@@ -344,12 +401,7 @@ abstract class CropAreasChooseBaseActivity extends BaseActivity implements Defin
         }
         mSpectrum = new ImageProcessor();
 
-        uCropView.setOnSetCropOverlayMovedListener(new CropImageView.OnSetCropOverlayMovedListener() {
-            @Override
-            public void onCropOverlayMoved(Rect rect) {
-                onUpdateCropping();
-            }
-        });
+        uCropView.setOnSetCropOverlayMovedListener(rect -> onUpdateCropping());
 
         setAspectRatio(currentAspectRatioString);
     }
@@ -384,9 +436,9 @@ abstract class CropAreasChooseBaseActivity extends BaseActivity implements Defin
     }
 
     protected void SetImageUriAndLastCropArea(Uri imageUri, Bundle savedInstanceState) {
-        final Rect crop = (Rect) ((savedInstanceState == null)
+        final Rect crop = (savedInstanceState == null)
                 ? null
-                : savedInstanceState.getParcelable(KEY_CURRENT_CROP_AREA));
+                : savedInstanceState.getParcelable(KEY_CURRENT_CROP_AREA);
 
         SetImageUriAndLastCropArea(imageUri, crop);
     }
@@ -454,17 +506,14 @@ abstract class CropAreasChooseBaseActivity extends BaseActivity implements Defin
             uCropView.setCropRect(crop);
 
             if (LOAD_ASYNC) {
-                uCropView.setOnSetImageUriCompleteListener(new CropImageView.OnSetImageUriCompleteListener() {
-                    @Override
-                    public void onSetImageUriComplete(CropImageView view, Uri imageUri, Exception error) {
-                        // called when uCropView recreation is completed.
-                        uCropView.setCropRect(crop);
-                        Rect newCrop = getCropRect();
-                        Log.d(TAG, getInstanceNo4Debug() + "delayed onCreate(): crop=" + crop + "/" + newCrop);
-                        uCropView.setOnSetImageUriCompleteListener(null);
+                uCropView.setOnSetImageUriCompleteListener((view, imageUri, error) -> {
+                    // called when uCropView recreation is completed.
+                    uCropView.setCropRect(crop);
+                    Rect newCrop = getCropRect();
+                    Log.d(TAG, getInstanceNo4Debug() + "delayed onCreate(): crop=" + crop + "/" + newCrop);
+                    uCropView.setOnSetImageUriCompleteListener(null);
 
-                        setRotationBeforeCrop(uCropView.getRotatedDegrees());
-                    }
+                    setRotationBeforeCrop(uCropView.getRotatedDegrees());
                 });
             }
         }
@@ -497,15 +546,18 @@ abstract class CropAreasChooseBaseActivity extends BaseActivity implements Defin
     }
 
     private void pickFromGallery(int requestId, int requestPermissionId) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN
-                && ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
-                != PackageManager.PERMISSION_GRANTED) {
-            requestPermission(Manifest.permission.READ_EXTERNAL_STORAGE,
-                    getString(R.string.permission_read_storage_rationale),
-                    requestPermissionId);
-        } else {
-            Log.d(TAG, getInstanceNo4Debug() + "Opening Image Picker");
-            Intent intent = new Intent(Intent.ACTION_GET_CONTENT)
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN
+//                && ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
+//                != PackageManager.PERMISSION_GRANTED) {
+//            requestPermission(Manifest.permission.READ_EXTERNAL_STORAGE,
+//                    getString(R.string.permission_read_storage_rationale),
+//                    requestPermissionId);
+//        }
+//        else
+        {
+            //Log.d(TAG, getInstanceNo4Debug() + "Opening Image Picker");
+            Intent intent = new Intent(android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT ?
+                    Intent.ACTION_OPEN_DOCUMENT : Intent.ACTION_GET_CONTENT)
                     .setType(IMAGE_JPEG_MIME)
                     .putExtra(Intent.EXTRA_TITLE, getString(R.string.label_select_picture))
                     .addCategory(Intent.CATEGORY_OPENABLE)
@@ -522,10 +574,10 @@ abstract class CropAreasChooseBaseActivity extends BaseActivity implements Defin
         if (outUri == null) return "";
         // may crash with "IllegalCharsetNameException" in https://github.com/k3b/LosslessJpgCrop/issues/7
         try {
-            return URLDecoder.decode(outUri.toString(), StandardCharsets.UTF_8.toString());
+            return URLDecoder.decode(outUri.toString(), Charset.forName("UTF-8").toString());
         } catch (Exception e) {
             // UnsupportedEncodingException, IllegalCharsetNameException
-            Log.e(TAG, getInstanceNo4Debug() + "err cannot convert imageUri to string('" + outUri.toString() + "').", e);
+            Log.e(TAG, getInstanceNo4Debug() + "err cannot convert imageUri to string('" + outUri + "').", e);
             return outUri.toString();
         }
     }
@@ -634,31 +686,34 @@ abstract class CropAreasChooseBaseActivity extends BaseActivity implements Defin
 
         if (inUri != null) {
             Rect rect = getCropRect();
-            InputStream inStream = null;
-            OutputStream outStream = null;
 
             final String context_message = getInstanceNo4Debug() + "Cropping '" + inUri + "'(" + rect + ") => '"
                     + outFile.getName() + " ";
             Log.i(TAG, context_message);
 
-            try {
-                inStream = getContentResolver().openInputStream(inUri);
-                outStream = new FileOutputStream(outFile, false);
+            try (InputStream inStream = getContentResolver().openInputStream(inUri);
+                 OutputStream outStream = FileUtils.getOutputStream(outFile)) {
                 crop(inStream, outStream, rect);
-
+                if(PreferenceManager
+                        .getDefaultSharedPreferences(this.getApplicationContext())
+                        .getBoolean("remove-exif", false)) {
+                    File img;
+                    try(InputStream is = FileUtils.getInputStream(img = outFile);
+                        OutputStream os = FileUtils.getOutputStream(outFile = new File(getCacheDir(), "s.jpg"))) {
+                        new ExifInterfaceExtended(img).saveExclusive(is, os, true);
+                    }
+                }
                 outUri = FileProvider.getUriForFile(this, "de.k3b.LLCrop", outFile);
-
             } catch (Exception e) {
                 // #14: delete affected file as it is useless
-                close(outStream, outStream);
                 outFile.delete();
                 Log.e(TAG, "Error " + context_message + "(" + outUri +") => " + e.getMessage(), e);
                 Toast.makeText(this,
-                        getString(R.string.toast_saved_error, outFile.getAbsolutePath(), e.getMessage()),
+                       // getString(R.string.toast_saved_error, outFile.getAbsolutePath(),
+                                e.getMessage()
+                       // )
+                        ,
                         Toast.LENGTH_LONG).show();
-            } finally {
-                close(outStream, outStream);
-                close(inStream, inStream);
             }
         } else {
             Log.e(TAG, getInstanceNo4Debug() + "Error cropToSharedUri(): Missing input imageUri.");
@@ -700,20 +755,20 @@ abstract class CropAreasChooseBaseActivity extends BaseActivity implements Defin
     Format 9:16:
             9x15,10x18
 */
-
+        getMenuInflater().inflate(R.menu.menu_exif, menu);
         return true;
     }
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         for(Integer key : menu2Rotation.keySet()) {
-            if (key != null) {
-                menu.findItem(key).setChecked(getRotationAfterCrop() == menu2Rotation.get(key));
-            }
+            if (key != null) menu.findItem(key).setChecked(getRotationAfterCrop() == menu2Rotation.get(key));
         }
-        if (ENABLE_ASPECT_RATIO) {
-            onPrepareMenuAspectRatio(menu);
-        }
+        if (ENABLE_ASPECT_RATIO) onPrepareMenuAspectRatio(menu);
+
+        menu.findItem(R.id.menu_exif).setTitle(getString(R.string.remove_exif, new StringBuilder().append('(').append(PreferenceManager
+                .getDefaultSharedPreferences(this.getApplicationContext())
+                .getBoolean("remove-exif", false)).append(')')));
         return super.onPrepareOptionsMenu(menu);
     }
 
@@ -745,6 +800,14 @@ abstract class CropAreasChooseBaseActivity extends BaseActivity implements Defin
             return true;
         } else if (menuItemId == R.id.menu_ratio_userdefined) {
             return onAspectRatioUserdefined((currentAspectRatioString == null) ? null : currentAspectRatioString.split("x"));
+        } else if (menuItemId == R.id.menu_exif) {
+            SharedPreferences sharedPreferences = PreferenceManager
+                    .getDefaultSharedPreferences(this.getApplicationContext());
+            sharedPreferences
+                    .edit()
+                    .putBoolean("remove-exif", !sharedPreferences.getBoolean("remove-exif", false))
+                    .apply();
+            return true;
         } else {
             return super.onOptionsItemSelected(item);
         }
@@ -903,11 +966,11 @@ abstract class CropAreasChooseBaseActivity extends BaseActivity implements Defin
             this.currentAspectRatioDefinitions.add(0, aspectRatio);
         }
         if (currentAspectRatioDefinitions != null) {
-            SharedPreferences.Editor edit = PreferenceManager
-                    .getDefaultSharedPreferences(this.getApplicationContext()).edit();
-
-            edit.putString(KEY_ASPECT_RATIO_DEFINITIONS, String.join(";", currentAspectRatioDefinitions));
-            edit.apply();
+           PreferenceManager
+                   .getDefaultSharedPreferences(this.getApplicationContext())
+                   .edit()
+                   .putString(KEY_ASPECT_RATIO_DEFINITIONS, String.join(";", currentAspectRatioDefinitions))
+                   .apply();
         }
 
     }

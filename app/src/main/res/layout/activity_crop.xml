@@ -12,6 +12,8 @@
        android:id="@+id/status"
        android:layout_width="match_parent"
        android:layout_height="wrap_content"
+       android:textColor="@android:color/white"
+       android:background="@android:color/black"
        android:text="(1521,481) .. (1792,831)" />
 
    <net.realify.lib.androidimagecropper.CropImageView

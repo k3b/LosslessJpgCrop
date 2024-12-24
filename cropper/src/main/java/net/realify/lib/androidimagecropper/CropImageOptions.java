@@ -55,7 +55,7 @@ public class CropImageOptions implements Parcelable {
   /**
    * The radius of the touchable area around the handle. (in pixels)<br>
    * We are basing this value off of the recommended 48dp Rhythm.<br>
-   * See: http://developer.android.com/design/style/metrics-grids.html#48dp-rhythm
+   * See: <a href="http://developer.android.com/design/style/metrics-grids.html#48dp-rhythm">...</a>
    */
   public float touchRadius;
 

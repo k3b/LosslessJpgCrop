@@ -1,15 +1,12 @@
 apply plugin: 'com.android.application'
 
 android {
-    //noinspection GradleCompatible
-    compileSdkVersion 28
+    compileSdk 34
     defaultConfig {
         applicationId "de.k3b.android.lossless_jpg_crop"
 
-        // SAF ACTION_CREATE_DOCUMENT requires api-19 and later
-        minSdkVersion 19		// Android 4.4 KitKat (API 19);  Android 5.0 Lollipop (API 21); Android 6.0 Marshmallow (API 23); Android 7.0 Nougat (API 24)
-        //noinspection ExpiredTargetSdkVersion
-        targetSdkVersion 29
+        minSdk 15
+        targetSdk 36
 
         // 1.0.0.190425 (1)    initial version
         // 1.0.1.190507 (2)    Bugfix: missing read permission; port to android-x
@@ -23,7 +20,6 @@ android {
         // 1.3.0.230218 (10)   new features: #15:modifyable dimensions; #35:Display crop box coordinates and size
         versionCode 10
         versionName "1.3.0.230218"
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
         // all supported locales. Note: the lib has more translations which are supressed here
         // resConfigs "ar","de","es","fr","hi","in","it","ja","nl","pl","ro","ru","tr","uk","zz","pt-rBR","zh-rCN","zh-rTW"
@@ -33,11 +29,11 @@ android {
         debug {
             shrinkResources true
             minifyEnabled true
-            // minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
 
             applicationIdSuffix ".debug"
-            versionNameSuffix "-DEBUG"        }
+            versionNameSuffix "-DEBUG"
+        }
         release {
             shrinkResources true
             minifyEnabled true
@@ -47,8 +43,7 @@ android {
     lintOptions {
         // http://stackoverflow.com/questions/31350350/generating-signed-apk-error7-missingtranslation-in-build-generated-res-gen
         // MissingTranslation : not all crowdwin translations are complete so ignore them
-        disable 'MissingTranslation'
-
+        // Hell nah dont just ignore the translations
         abortOnError false
     }
     compileOptions {
@@ -59,17 +54,12 @@ android {
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-    implementation 'androidx.annotation:annotation:1.2.0'
 
-    implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
-    testImplementation 'junit:junit:4.13.2'
-    androidTestImplementation 'androidx.test:runner:1.4.0'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
 
 
     // implements lossless croppig
     //  implementation 'com.facebook.spectrum:spectrum-default:1.0.0'
+    implementation("io.github.tommy-geenexus:exif-interface-extended:1.0.3")
     implementation 'com.facebook.spectrum:spectrum-core:1.3.0'
     implementation 'com.facebook.spectrum:spectrum-jpeg:1.3.0'
     // the cropping gui

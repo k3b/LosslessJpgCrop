@@ -116,7 +116,7 @@ final class BitmapUtils {
       // Calculate inSampleSize
       options.inSampleSize =
           Math.max(
-              calculateInSampleSizeByReqestedSize(
+              calculateInSampleSizeByRequestedSize(
                   options.outWidth, options.outHeight, reqWidth, reqHeight),
               calculateInSampleSizeByMaxTextureSize(options.outWidth, options.outHeight));
 
@@ -553,7 +553,7 @@ final class BitmapUtils {
       options.inSampleSize =
           sampleSize =
               sampleMulti
-                  * calculateInSampleSizeByReqestedSize(rect.width(), rect.height(), width, height);
+                  * calculateInSampleSizeByRequestedSize(rect.width(), rect.height(), width, height);
 
       Bitmap fullBitmap = decodeImage(context.getContentResolver(), loadedImageUri, options);
       if (fullBitmap != null) {
@@ -645,7 +645,7 @@ final class BitmapUtils {
       BitmapFactory.Options options = new BitmapFactory.Options();
       options.inSampleSize =
           sampleMulti
-              * calculateInSampleSizeByReqestedSize(
+              * calculateInSampleSizeByRequestedSize(
                   rect.width(), rect.height(), reqWidth, reqHeight);
 
       stream = context.getContentResolver().openInputStream(uri);
@@ -670,7 +670,7 @@ final class BitmapUtils {
   }
 
   /**
-   * Special crop of bitmap rotated by not stright angle, in this case the original crop bitmap
+   * Special crop of bitmap rotated by not straight angle, in this case the original crop bitmap
    * contains parts beyond the required crop area, this method crops the already cropped and rotated
    * bitmap to the final rectangle.<br>
    * Note: rotating by 0, 90, 180 or 270 degrees doesn't require extra cropping.
@@ -719,7 +719,7 @@ final class BitmapUtils {
    * Calculate the largest inSampleSize value that is a power of 2 and keeps both height and width
    * larger than the requested height and width.
    */
-  private static int calculateInSampleSizeByReqestedSize(
+  private static int calculateInSampleSizeByRequestedSize(
       int width, int height, int reqWidth, int reqHeight) {
     int inSampleSize = 1;
     if (height > reqHeight || width > reqWidth) {
@@ -771,7 +771,7 @@ final class BitmapUtils {
 
   /**
    * Get the max size of bitmap allowed to be rendered on the device.<br>
-   * http://stackoverflow.com/questions/7428996/hw-accelerated-activity-how-to-get-opengl-texture-size-limit.
+   * <a href="http://stackoverflow.com/questions/7428996/hw-accelerated-activity-how-to-get-opengl-texture-size-limit">...</a>.
    */
   private static int getMaxTextureSize() {
     // Safe minimum default size

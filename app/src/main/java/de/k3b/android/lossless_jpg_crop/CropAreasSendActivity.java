@@ -36,7 +36,7 @@ public class CropAreasSendActivity extends CropAreasChooseBaseActivity {
         Uri uri = super.getSourceImageUri(intent);
 
         if ((uri == null) && (intent != null)) {
-            Bundle extras = (uri != null) ? null : intent.getExtras();
+            Bundle extras = intent.getExtras();
             Object stream = (extras == null) ? null : extras.get(Intent.EXTRA_STREAM);
             if (stream != null) {
                 uri = Uri.parse(stream.toString());

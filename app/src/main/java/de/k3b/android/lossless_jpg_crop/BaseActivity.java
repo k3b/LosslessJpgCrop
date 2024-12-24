@@ -1,14 +1,18 @@
 package de.k3b.android.lossless_jpg_crop;
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 
 /**
- * Created by Oleksii Shliama (https://github.com/shliama).
+ * Created by Oleksii Shliama (<a href="https://github.com/shliama">...</a>).
  */
 public class BaseActivity extends Activity {
 
@@ -25,6 +29,12 @@ public class BaseActivity extends Activity {
         }
     }
 
+    @Override
+    protected void onStart() {
+        ActionBar ab = getActionBar();
+        if(ab != null) ab.setBackgroundDrawable(new ColorDrawable(Color.BLACK));
+        super.onStart();
+    }
 
     /**
      * Requests given permission.
@@ -34,13 +44,8 @@ public class BaseActivity extends Activity {
     protected void requestPermission(final String permission, String rationale, final int requestCode) {
         if (ActivityCompat.shouldShowRequestPermissionRationale(this, permission)) {
             showAlertDialog(getString(R.string.permission_title_rationale), rationale,
-                    new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            ActivityCompat.requestPermissions(BaseActivity.this,
-                                    new String[]{permission}, requestCode);
-                        }
-                    }, getString(android.R.string.ok), null, getString(android.R.string.cancel));
+                    (dialog, which) -> ActivityCompat.requestPermissions(BaseActivity.this,
+                            new String[]{permission}, requestCode), getString(android.R.string.ok), null, getString(android.R.string.cancel));
         } else {
             ActivityCompat.requestPermissions(this, new String[]{permission}, requestCode);
         }
@@ -69,5 +74,4 @@ public class BaseActivity extends Activity {
         builder.setNegativeButton(negativeText, onNegativeButtonClickListener);
         mAlertDialog = builder.show();
     }
-
 }
