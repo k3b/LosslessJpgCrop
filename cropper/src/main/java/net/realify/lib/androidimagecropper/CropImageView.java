@@ -1195,6 +1195,11 @@ public class CropImageView extends FrameLayout {
       clearImageInt();
 
       mBitmap = bitmap;
+
+      if (mBitmap.getByteCount() > 200000000) {
+        mImageView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
+      }
+      
       mImageView.setImageBitmap(mBitmap);
 
       mLoadedImageUri = imageUri;
